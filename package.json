@@ -1,0 +1,35 @@
+{
+  "name": "ngarembug-monolith",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome check",
+    "format": "biome format --write"
+  },
+  "dependencies": {
+    "@next/env": "^16.0.10",
+    "drizzle-orm": "^0.45.1",
+    "drizzle-zod": "^0.8.3",
+    "next": "16.0.10",
+    "pg": "^8.16.3",
+    "postgres": "^3.4.7",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "drizzle-kit": "^0.31.8",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
