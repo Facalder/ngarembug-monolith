@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter } from "next/font/google";
+import { Bricolage_Grotesque, Geist_Mono, Inter } from "next/font/google";
 import "@/app/styles/globals.css";
 
 const geistMono = Geist_Mono({
@@ -9,6 +9,11 @@ const geistMono = Geist_Mono({
 
 const interSans = Inter({
   variable: "--font-inter-sans",
+  subsets: ["latin"],
+});
+
+const bricolageSans = Bricolage_Grotesque({
+  variable: "--font-bricolage-sans",
   subsets: ["latin"],
 });
 
@@ -25,10 +30,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${interSans.variable} ${geistMono.variable} font-sans antialiased`}
+        className={`${interSans.variable} ${geistMono.variable} ${bricolageSans.variable} font-sans antialiased`}
       >
         {children}
       </body>
     </html>
   );
-}
+} 

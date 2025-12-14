@@ -20,10 +20,10 @@ export default function DashboardLayout({
         <div className="flex flex-1 overflow-hidden">
           <AppSidebar />
           <SidebarInset>
-            <div className="flex flex-col flex-1 gap-4 p-4 md:p-10 min-h-0">
+            <div className="container lg:p-10 space-y-5 p-4 md:p-8 min-h-0">
               {children}
-              <Toaster richColors theme="light" />
             </div>
+            <Toaster richColors theme="light" />
           </SidebarInset>
         </div>
       </SidebarProvider>

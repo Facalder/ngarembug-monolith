@@ -1,3 +1,12 @@
+import DashboardTitle from "@/components/dashboard-title";
+
 export default function CafePage() {
-  return <h1>ini adalah cafe dashboard</h1>;
+  return (
+    <DashboardTitle 
+      title="Halaman Cafe"
+      subtitle="Kelola data cafe"
+      createLabel="Tambah kafe"
+      createHref="/dashboard/cafes/create"
+    />
+  )
 }

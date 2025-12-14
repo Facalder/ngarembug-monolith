@@ -2,7 +2,7 @@
 
 import { SidebarLeft01FreeIcons } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
+import DashboardBreadcrumbs from "@/components/dashboard-breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -22,7 +22,7 @@ export default function DashboardNavbar() {
           <HugeiconsIcon icon={SidebarLeft01FreeIcons} />
         </Button>
         <Separator orientation="vertical" className="mr-2" />
-        <Breadcrumb />
+        <DashboardBreadcrumbs />
       </div>
     </header>
   );
