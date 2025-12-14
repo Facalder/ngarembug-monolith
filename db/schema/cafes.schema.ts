@@ -33,8 +33,12 @@ const cafesTable = pgTable.withRLS("cafes", {
   priceRange: priceRange("price_range").notNull(),
   pricePerPerson: integer("price_per_person").notNull().default(0),
 
-  averageRating: numeric("average_rating", { precision: 3, scale: 2 })
-    .default("0")
+  averageRating: numeric("average_rating", {
+    precision: 3,
+    scale: 2,
+    mode: "number",
+  })
+    .default(0)
     .notNull(),
   totalReviews: integer("total_reviews").default(0).notNull(),
 

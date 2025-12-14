@@ -1,4 +1,4 @@
-import { pgEnum, pgRole } from "drizzle-orm/pg-core";
+import { pgEnum } from "drizzle-orm/pg-core";
 
 export const contentStatus = pgEnum("ContentStatus", [
   "DRAFT",

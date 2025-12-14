@@ -1,50 +1,50 @@
 export const CONTENT_STATUS_OPTIONS = [
-  { value: "DRAFT", label: "Draft" },
-  { value: "PUBLISHED", label: "Terpublish" },
-  { value: "ARCHIVED", label: "Arsip" },
+  { value: "DRAFT", label: "Draft", alias: "dft" },
+  { value: "PUBLISHED", label: "Terpublish", alias: "pub" },
+  { value: "ARCHIVED", label: "Arsip", alias: "arc" },
 ] as const;
 
 export const PRICE_RANGE_OPTIONS = [
-  { value: "LOW", label: "Murah" },
-  { value: "MEDIUM", label: "Sedang" },
-  { value: "HIGH", label: "Mahal" },
-  { value: "PREMIUM", label: "Premium" },
+  { value: "LOW", label: "Murah", alias: "low" },
+  { value: "MEDIUM", label: "Sedang", alias: "mid" },
+  { value: "HIGH", label: "Mahal", alias: "high" },
+  { value: "PREMIUM", label: "Premium", alias: "prem" },
 ] as const;
 
 export const CAFE_TYPE_OPTIONS = [
-  { value: "INDOOR_CAFE", label: "Cafe Indoor" },
-  { value: "OUTDOOR_CAFE", label: "Cafe Outdoor" },
+  { value: "INDOOR_CAFE", label: "Cafe Indoor", alias: "in" },
+  { value: "OUTDOOR_CAFE", label: "Cafe Outdoor", alias: "out" },
 ] as const;
 
 export const REGION_OPTIONS = [
-  { value: "SUKABIRUS", label: "Sukabirus" },
-  { value: "SUKAPURA", label: "Sukapura" },
-  { value: "BATUNUNGGAL", label: "Batununggal" },
-  { value: "BUAH BATU", label: "Buah Batu" },
-  { value: "DAYEUH KOLOT", label: "Dayeuh Kolot" },
-  { value: "CIGANITRI", label: "Ciganitri" },
+  { value: "SUKABIRUS", label: "Sukabirus", alias: "skb" },
+  { value: "SUKAPURA", label: "Sukapura", alias: "skp" },
+  { value: "BATUNUNGGAL", label: "Batununggal", alias: "btn" },
+  { value: "BUAH BATU", label: "Buah Batu", alias: "bbt" },
+  { value: "DAYEUH KOLOT", label: "Dayeuh Kolot", alias: "dyk" },
+  { value: "CIGANITRI", label: "Ciganitri", alias: "cgn" },
 ] as const;
 
 export const REVIEW_STATUS_OPTIONS = [
-  { value: "APPROVED", label: "Disetujui" },
-  { value: "REJECTED", label: "Ditolak" },
-  { value: "PENDING", label: "Menunggu" },
+  { value: "APPROVED", label: "Disetujui", alias: "app" },
+  { value: "REJECTED", label: "Ditolak", alias: "rej" },
+  { value: "PENDING", label: "Menunggu", alias: "pen" },
 ] as const;
 
 export const STAR_RATING_OPTIONS = [
-  { value: "ONE", label: "1 Bintang" },
-  { value: "TWO", label: "2 Bintang" },
-  { value: "THREE", label: "3 Bintang" },
-  { value: "FOUR", label: "4 Bintang" },
-  { value: "FIVE", label: "5 Bintang" },
+  { value: "ONE", label: "1 Bintang", alias: "1" },
+  { value: "TWO", label: "2 Bintang", alias: "2" },
+  { value: "THREE", label: "3 Bintang", alias: "3" },
+  { value: "FOUR", label: "4 Bintang", alias: "4" },
+  { value: "FIVE", label: "5 Bintang", alias: "5" },
 ] as const;
 
 export const VISITOR_TYPE_OPTIONS = [
-  { value: "FAMILY", label: "Keluarga" },
-  { value: "COUPLE", label: "Pasangan" },
-  { value: "SOLO", label: "Sendiri" },
-  { value: "BUSINESS", label: "Bisnis" },
-  { value: "FRIENDS", label: "Teman" },
+  { value: "FAMILY", label: "Keluarga", alias: "fam" },
+  { value: "COUPLE", label: "Pasangan", alias: "cpl" },
+  { value: "SOLO", label: "Sendiri", alias: "sol" },
+  { value: "BUSINESS", label: "Bisnis", alias: "bus" },
+  { value: "FRIENDS", label: "Teman", alias: "frn" },
 ] as const;
 
 export const DAYS_OPTIONS = [
