@@ -1,4 +1,4 @@
-import { pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
+import { index, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
 import { cafes } from "@/db/schema/cafes.schema";
 import { facilities } from "@/db/schema/facilities.schema";
 import { terms } from "@/db/schema/terms.schema";
@@ -20,7 +20,10 @@ export const cafeFacilities = pgTable.withRLS(
       }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [primaryKey({ columns: [table.cafeId, table.facilityId] })],
+  (table) => [
+    primaryKey({ columns: [table.cafeId, table.facilityId] }),
+    index("idx_cafe_fac_facility").on(table.facilityId),
+  ],
 );
 
 export const cafeTerms = pgTable.withRLS(
@@ -43,5 +46,8 @@ export const cafeTerms = pgTable.withRLS(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [primaryKey({ columns: [table.cafeId, table.termId] })],
+  (table) => [
+    primaryKey({ columns: [table.cafeId, table.termId] }),
+    index("idx_cafe_term_term").on(table.termId),
+  ],
 );

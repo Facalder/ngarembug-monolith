@@ -68,6 +68,8 @@ export const cafeSchema = z.object({
   region: z.enum(regionValues, { message: "Wilayah tidak valid" }),
   capacity: z.coerce.number().int().min(0, "Kapasitas minimal 0").default(0),
   distance: z.coerce.number().int().min(0, "Jarak minimal 0").optional(),
+  
+  mapLink: z.url("Format URL tidak valid"),
 
   address: z
     .string()

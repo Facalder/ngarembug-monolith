@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "db:drizzle-generate": "npx drizzle-kit generate",
-    "db:drizzle-migrate": "npx drizzle-kit migrate"
+    "db-generate": "npx drizzle-kit generate",
+    "db-migrate": "npx drizzle-kit migrate"
   },
   "dependencies": {
     "@next/env": "^16.0.10",

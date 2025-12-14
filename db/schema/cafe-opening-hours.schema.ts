@@ -1,4 +1,4 @@
-import { pgTable, smallint, text, time, timestamp } from "drizzle-orm/pg-core";
+import { index, pgTable, smallint, text, time, timestamp } from "drizzle-orm/pg-core";
 import { cafes } from "@/db/schema/cafes.schema";
 import { createId } from "@/lib/cuid";
 
@@ -21,6 +21,10 @@ const cafeOpeningHoursTable = pgTable.withRLS("cafe_opening_hours", {
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+}, (table) => {
+  return [
+    index("idx_hours_cafe_day").on(table.cafeId, table.dayOfWeek),
+  ];
 });
 
 export const cafeOpeningHours = cafeOpeningHoursTable;

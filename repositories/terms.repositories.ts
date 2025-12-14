@@ -12,10 +12,10 @@ import {
 } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db";
-import { facilities } from "@/db/schema/facilities.schema";
-import type { FacilityQuery } from "@/schemas/facilities.dto";
+import { terms } from "@/db/schema/terms.schema";
+import type { TermQuery } from "@/schemas/terms.dto";
 
-export const findFacilities = cache(async (params: FacilityQuery) => {
+export const findTerms = cache(async (params: TermQuery) => {
   const {
     id,
     slug,
@@ -27,23 +27,23 @@ export const findFacilities = cache(async (params: FacilityQuery) => {
   } = params;
 
   const conditions = [
-    id && eq(facilities.id, id),
-    slug && eq(facilities.slug, slug),
+    id && eq(terms.id, id),
+    slug && eq(terms.slug, slug),
     keyword && or(
-      ilike(facilities.name, `%${keyword}%`),
-      ilike(facilities.description, `%${keyword}%`)
+      ilike(terms.name, `%${keyword}%`),
+      ilike(terms.description, `%${keyword}%`)
     ),
   ].filter(Boolean) as SQL[];
 
   const orderCol = {
-    name: facilities.name,
-    created_at: facilities.createdAt,
-    updated_at: facilities.updatedAt,
+    name: terms.name,
+    created_at: terms.createdAt,
+    updated_at: terms.updatedAt,
   }[orderBy];
 
   const data = await db
     .select()
-    .from(facilities)
+    .from(terms)
     .where(conditions.length ? and(...conditions) : undefined)
     .orderBy(orderDir === "asc" ? asc(orderCol) : desc(orderCol))
     .limit(limit)
@@ -51,7 +51,7 @@ export const findFacilities = cache(async (params: FacilityQuery) => {
 
   const [{ count }] = await db
     .select({ count: sql<number>`count(*)` })
-    .from(facilities)
+    .from(terms)
     .where(conditions.length ? and(...conditions) : undefined);
 
   return {

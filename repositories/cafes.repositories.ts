@@ -14,7 +14,7 @@ import {
 import { cache } from "react";
 import { db } from "@/db";
 import { cafes } from "@/db/schema/cafes.schema";
-import type { CafeQuery } from "@/schemas/cafe.dto";
+import type { CafeQuery } from "@/schemas/cafes.dto";
 
 export const findCafes = cache(async (params: CafeQuery) => {
   const {

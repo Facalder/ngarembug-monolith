@@ -26,9 +26,10 @@ CREATE TABLE "cafes" (
 	"capacity" smallint DEFAULT 0 NOT NULL,
 	"distance" smallint DEFAULT 0,
 	"address" varchar(255) NOT NULL,
-	"phone" varchar(20),
-	"email" varchar(100),
-	"website" varchar(255),
+	"phone" varchar(20) UNIQUE,
+	"email" varchar(100) UNIQUE,
+	"website" varchar(255) UNIQUE,
+	"map_link" text NOT NULL UNIQUE,
 	"price_range" "PriceRange" NOT NULL,
 	"price_per_person" integer DEFAULT 0 NOT NULL,
 	"average_rating" numeric(3,2) DEFAULT '0' NOT NULL,
@@ -75,6 +76,13 @@ CREATE TABLE "terms" (
 );
 --> statement-breakpoint
 ALTER TABLE "terms" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+CREATE INDEX "idx_hours_cafe_day" ON "cafe_opening_hours" ("cafe_id","day_of_week");--> statement-breakpoint
+CREATE INDEX "idx_cafes_region_type" ON "cafes" ("region","cafe_type");--> statement-breakpoint
+CREATE INDEX "idx_cafes_price_rating" ON "cafes" ("price_per_person","average_rating");--> statement-breakpoint
+CREATE INDEX "idx_cafes_avg_rating" ON "cafes" ("average_rating");--> statement-breakpoint
+CREATE INDEX "idx_cafes_created_at" ON "cafes" ("created_at");--> statement-breakpoint
+CREATE INDEX "idx_cafe_fac_facility" ON "cafe_facilities" ("facility_id");--> statement-breakpoint
+CREATE INDEX "idx_cafe_term_term" ON "cafe_terms" ("term_id");--> statement-breakpoint
 ALTER TABLE "cafe_opening_hours" ADD CONSTRAINT "cafe_opening_hours_cafe_id_cafes_id_fkey" FOREIGN KEY ("cafe_id") REFERENCES "cafes"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
 ALTER TABLE "cafe_facilities" ADD CONSTRAINT "cafe_facilities_cafe_id_cafes_id_fkey" FOREIGN KEY ("cafe_id") REFERENCES "cafes"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
 ALTER TABLE "cafe_facilities" ADD CONSTRAINT "cafe_facilities_facility_id_facilities_id_fkey" FOREIGN KEY ("facility_id") REFERENCES "facilities"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint

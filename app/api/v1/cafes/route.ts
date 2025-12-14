@@ -1,13 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { findFacilities } from "@/repositories/facilities.repositories";
-import { facilityQuerySchema } from "@/schemas/facilities.dto";
+import { findCafes } from "@/repositories/cafes.repositories";
+import { cafeQuerySchema } from "@/schemas/cafes.dto";
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = Object.fromEntries(request.nextUrl.searchParams);
 
     // Parse and validate query parameters
-    const parsedParams = facilityQuerySchema.safeParse(searchParams);
+    const parsedParams = cafeQuerySchema.safeParse(searchParams);
 
     if (!parsedParams.success) {
       return NextResponse.json(
@@ -16,11 +16,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const result = await findFacilities(parsedParams.data);
+    const result = await findCafes(parsedParams.data);
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Error fetching facilities:", error);
+    console.error("Error fetching cafes:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
