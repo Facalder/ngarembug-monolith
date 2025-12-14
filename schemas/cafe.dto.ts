@@ -1,5 +1,3 @@
 import z from "zod";
 
-export const CafesDtoSchema = z.object({
-    
-})
+export const CafesDtoSchema = z.object({});

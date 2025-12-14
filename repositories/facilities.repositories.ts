@@ -1,5 +1,3 @@
-"use server"
+"use server";
 
-export const findAll = async () => { 
-    
-}
+export const findAll = async () => {};
