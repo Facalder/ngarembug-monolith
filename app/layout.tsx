@@ -9,8 +9,8 @@ const geistMono = Geist_Mono({
 
 const interSans = Inter({
   variable: "--font-inter-sans",
-  subsets: ['latin']
-})
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${interSans.variable} ${geistMono.variable} antialiased`}
+        className={`${interSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
         {children}
       </body>

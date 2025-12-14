@@ -1,15 +1,6 @@
 "use server";
 
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  ilike,
-  or,
-  type SQL,
-  sql,
-} from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, type SQL, sql } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db";
 import { terms } from "@/db/schema/terms.schema";
@@ -29,10 +20,11 @@ export const findTerms = cache(async (params: TermQuery) => {
   const conditions = [
     id && eq(terms.id, id),
     slug && eq(terms.slug, slug),
-    keyword && or(
-      ilike(terms.name, `%${keyword}%`),
-      ilike(terms.description, `%${keyword}%`)
-    ),
+    keyword &&
+      or(
+        ilike(terms.name, `%${keyword}%`),
+        ilike(terms.description, `%${keyword}%`),
+      ),
   ].filter(Boolean) as SQL[];
 
   const orderCol = {
@@ -70,7 +62,10 @@ export const createTerm = async (data: typeof terms.$inferInsert) => {
   return newTerm;
 };
 
-export const updateTerm = async (id: string, data: Partial<typeof terms.$inferInsert>) => {
+export const updateTerm = async (
+  id: string,
+  data: Partial<typeof terms.$inferInsert>,
+) => {
   const [updatedTerm] = await db
     .update(terms)
     .set(data)

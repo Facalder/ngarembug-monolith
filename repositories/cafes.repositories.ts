@@ -35,14 +35,14 @@ export const findCafes = cache(async (params: CafeQuery) => {
 
   const conditions = [
     id && eq(cafes.id, id),
-      slug && eq(cafes.slug, slug),
-      region?.length && inArray(cafes.region, region),
-      types?.length && inArray(cafes.cafeType, types),
-      priceRange?.length && inArray(cafes.priceRange, priceRange),
-      minPrice !== undefined && gte(cafes.pricePerPerson, minPrice),
-      maxPrice !== undefined && lte(cafes.pricePerPerson, maxPrice),
-      minReviews !== undefined && gte(cafes.totalReviews, minReviews),
-      minAvgRating !== undefined && gte(cafes.averageRating, minAvgRating),
+    slug && eq(cafes.slug, slug),
+    region?.length && inArray(cafes.region, region),
+    types?.length && inArray(cafes.cafeType, types),
+    priceRange?.length && inArray(cafes.priceRange, priceRange),
+    minPrice !== undefined && gte(cafes.pricePerPerson, minPrice),
+    maxPrice !== undefined && lte(cafes.pricePerPerson, maxPrice),
+    minReviews !== undefined && gte(cafes.totalReviews, minReviews),
+    minAvgRating !== undefined && gte(cafes.averageRating, minAvgRating),
   ].filter(Boolean) as SQL[];
 
   const orderCol = {

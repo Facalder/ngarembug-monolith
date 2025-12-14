@@ -11,14 +11,15 @@ export function proxy(request: NextRequest) {
       console.warn("API_TOKEN is not defined in environment variables");
       return NextResponse.json(
         { error: "Server Configuration Error: API_TOKEN missing" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { error: "Missing or invalid Authorization header", status: 401 },
-      );
+      return NextResponse.json({
+        error: "Missing or invalid Authorization header",
+        status: 401,
+      });
     }
 
     const providedToken = authHeader.split(" ")[1];

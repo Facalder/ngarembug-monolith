@@ -11,7 +11,7 @@ import {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = Object.fromEntries(request.nextUrl.searchParams);
-    
+
     const parsedParams = facilityQuerySchema.safeParse(searchParams);
 
     if (!parsedParams.success) {

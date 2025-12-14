@@ -15,14 +15,18 @@ export const termSchema = z.object({
 export const termQuerySchema = z.object({
   id: z.string().optional(),
   slug: z.string().optional(),
-  
+
   keyword: z.string().optional(),
 
   orderBy: z.enum(["name", "created_at", "updated_at"]).optional(),
   orderDir: z.enum(["asc", "desc"]).optional(),
 
   page: z.coerce.number().min(1, "Page must be at least 1").default(1),
-  limit: z.coerce.number().min(1, "Limit must be at least 1").max(100, "Limit must be at most 100").default(10),
+  limit: z.coerce
+    .number()
+    .min(1, "Limit must be at least 1")
+    .max(100, "Limit must be at most 100")
+    .default(10),
 });
 
 export const createTermSchema = termSchema;

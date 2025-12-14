@@ -1,15 +1,6 @@
 "use server";
 
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  ilike,
-  or,
-  type SQL,
-  sql,
-} from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, type SQL, sql } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db";
 import { facilities } from "@/db/schema/facilities.schema";
@@ -29,10 +20,11 @@ export const findFacilities = cache(async (params: FacilityQuery) => {
   const conditions = [
     id && eq(facilities.id, id),
     slug && eq(facilities.slug, slug),
-    keyword && or(
-      ilike(facilities.name, `%${keyword}%`),
-      ilike(facilities.description, `%${keyword}%`)
-    ),
+    keyword &&
+      or(
+        ilike(facilities.name, `%${keyword}%`),
+        ilike(facilities.description, `%${keyword}%`),
+      ),
   ].filter(Boolean) as SQL[];
 
   const orderCol = {
@@ -70,7 +62,10 @@ export const createFacility = async (data: typeof facilities.$inferInsert) => {
   return newFacility;
 };
 
-export const updateFacility = async (id: string, data: Partial<typeof facilities.$inferInsert>) => {
+export const updateFacility = async (
+  id: string,
+  data: Partial<typeof facilities.$inferInsert>,
+) => {
   const [updatedFacility] = await db
     .update(facilities)
     .set(data)

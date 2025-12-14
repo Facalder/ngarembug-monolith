@@ -12,15 +12,15 @@ const priceRangeValues = priceRange.enumValues;
 const regionValues = region.enumValues;
 
 const REGION_ALIAS = Object.fromEntries(
-  REGION_OPTIONS.map((opt) => [opt.alias, opt.value])
+  REGION_OPTIONS.map((opt) => [opt.alias, opt.value]),
 );
 
 const TYPE_ALIAS = Object.fromEntries(
-  CAFE_TYPE_OPTIONS.map((opt) => [opt.alias, opt.value])
+  CAFE_TYPE_OPTIONS.map((opt) => [opt.alias, opt.value]),
 );
 
 const PRICE_ALIAS = Object.fromEntries(
-  PRICE_RANGE_OPTIONS.map((opt) => [opt.alias, opt.value])
+  PRICE_RANGE_OPTIONS.map((opt) => [opt.alias, opt.value]),
 );
 
 type Region = (typeof REGION_OPTIONS)[number]["value"];
@@ -29,7 +29,7 @@ type PriceRange = (typeof PRICE_RANGE_OPTIONS)[number]["value"];
 
 const createAliasSchema = <T extends string>(
   validValues: readonly T[],
-  aliases: Record<string, T>
+  aliases: Record<string, T>,
 ) => {
   return z
     .union([z.string(), z.array(z.string())])
@@ -40,10 +40,11 @@ const createAliasSchema = <T extends string>(
         .map((item) => {
           const lower = item.toLowerCase().trim();
           if (lower in aliases) return aliases[lower];
-          
+
           const upper = item.toUpperCase().trim();
-          if ((validValues as readonly string[]).includes(upper)) return upper as T;
-          
+          if ((validValues as readonly string[]).includes(upper))
+            return upper as T;
+
           return null;
         })
         .filter((val): val is T => val !== null);
@@ -68,7 +69,7 @@ export const cafeSchema = z.object({
   region: z.enum(regionValues, { message: "Wilayah tidak valid" }),
   capacity: z.coerce.number().int().min(0, "Kapasitas minimal 0").default(0),
   distance: z.coerce.number().int().min(0, "Jarak minimal 0").optional(),
-  
+
   mapLink: z.url("Format URL tidak valid"),
 
   address: z
@@ -88,30 +89,67 @@ export const cafeSchema = z.object({
 export const cafeQuerySchema = z.object({
   id: z.string().optional(),
   slug: z.string().optional(),
-  
-  region: createAliasSchema<Region>(regionValues as unknown as Region[], REGION_ALIAS),
-  
-  types: createAliasSchema<CafeType>(cafeTypeValues as unknown as CafeType[], TYPE_ALIAS),
 
-  priceRange: createAliasSchema<PriceRange>(priceRangeValues as unknown as PriceRange[], PRICE_ALIAS),
+  region: createAliasSchema<Region>(
+    regionValues as unknown as Region[],
+    REGION_ALIAS,
+  ),
+
+  types: createAliasSchema<CafeType>(
+    cafeTypeValues as unknown as CafeType[],
+    TYPE_ALIAS,
+  ),
+
+  priceRange: createAliasSchema<PriceRange>(
+    priceRangeValues as unknown as PriceRange[],
+    PRICE_ALIAS,
+  ),
   minPrice: z.coerce.number().min(0, "Min price must be at least 0").optional(),
   maxPrice: z.coerce.number().min(0, "Max price must be at least 0").optional(),
 
-  minReviews: z.coerce.number().min(0, "Min reviews must be at least 0").optional(),
-  minAvgRating: z.coerce.number().min(0).max(5, "Rating must be between 0 and 5").optional(),
+  minReviews: z.coerce
+    .number()
+    .min(0, "Min reviews must be at least 0")
+    .optional(),
+  minAvgRating: z.coerce
+    .number()
+    .min(0)
+    .max(5, "Rating must be between 0 and 5")
+    .optional(),
 
-  maxDistance: z.coerce.number().min(0, "Max distance must be at least 0").optional(),
+  maxDistance: z.coerce
+    .number()
+    .min(0, "Max distance must be at least 0")
+    .optional(),
 
-  orderBy: z.enum(["price", "rating", "reviews", "distance", "capacity", "created_at", "updated_at"]).optional(),
+  orderBy: z
+    .enum([
+      "price",
+      "rating",
+      "reviews",
+      "distance",
+      "capacity",
+      "created_at",
+      "updated_at",
+    ])
+    .optional(),
   orderDir: z.enum(["asc", "desc"]).optional(),
 
   page: z.coerce.number().min(1, "Page must be at least 1").default(1),
-  limit: z.coerce.number().min(1, "Limit must be at least 1").max(100, "Limit must be at most 100").default(10),
+  limit: z.coerce
+    .number()
+    .min(1, "Limit must be at least 1")
+    .max(100, "Limit must be at most 100")
+    .default(10),
 });
 
 export const cafeWithHoursSchema = cafeSchema.extend({
-  openingTime: z.string().regex(/^\d{2}:\d{2}$/, "Format waktu tidak valid (HH:MM)"),
-  closingTime: z.string().regex(/^\d{2}:\d{2}$/, "Format waktu tidak valid (HH:MM)"),
+  openingTime: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/, "Format waktu tidak valid (HH:MM)"),
+  closingTime: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/, "Format waktu tidak valid (HH:MM)"),
 });
 
 export const createCafeSchema = cafeSchema;
