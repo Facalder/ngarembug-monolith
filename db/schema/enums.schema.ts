@@ -17,7 +17,7 @@ export const region = pgEnum("Region", [
   "SUKAPURA",
   "BATUNUNGGAL",
   "BUAH BATU",
-  "DAYEUH KOLOT",
+  "DAYEUH_KOLOT",
   "CIGANITRI",
 ]);
 export const reviewStatus = pgEnum("ReviewStatus", [
