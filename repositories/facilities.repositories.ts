@@ -64,3 +64,25 @@ export const findFacilities = cache(async (params: FacilityQuery) => {
     },
   };
 });
+
+export const createFacility = async (data: typeof facilities.$inferInsert) => {
+  const [newFacility] = await db.insert(facilities).values(data).returning();
+  return newFacility;
+};
+
+export const updateFacility = async (id: string, data: Partial<typeof facilities.$inferInsert>) => {
+  const [updatedFacility] = await db
+    .update(facilities)
+    .set(data)
+    .where(eq(facilities.id, id))
+    .returning();
+  return updatedFacility;
+};
+
+export const deleteFacility = async (id: string) => {
+  const [deletedFacility] = await db
+    .delete(facilities)
+    .where(eq(facilities.id, id))
+    .returning();
+  return deletedFacility;
+};

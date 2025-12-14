@@ -64,3 +64,25 @@ export const findTerms = cache(async (params: TermQuery) => {
     },
   };
 });
+
+export const createTerm = async (data: typeof terms.$inferInsert) => {
+  const [newTerm] = await db.insert(terms).values(data).returning();
+  return newTerm;
+};
+
+export const updateTerm = async (id: string, data: Partial<typeof terms.$inferInsert>) => {
+  const [updatedTerm] = await db
+    .update(terms)
+    .set(data)
+    .where(eq(terms.id, id))
+    .returning();
+  return updatedTerm;
+};
+
+export const deleteTerm = async (id: string) => {
+  const [deletedTerm] = await db
+    .delete(terms)
+    .where(eq(terms.id, id))
+    .returning();
+  return deletedTerm;
+};

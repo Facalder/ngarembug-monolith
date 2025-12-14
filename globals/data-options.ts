@@ -21,7 +21,7 @@ export const REGION_OPTIONS = [
   { value: "SUKAPURA", label: "Sukapura", alias: "skp" },
   { value: "BATUNUNGGAL", label: "Batununggal", alias: "btn" },
   { value: "BUAH BATU", label: "Buah Batu", alias: "bbt" },
-  { value: "DAYEUH KOLOT", label: "Dayeuh Kolot", alias: "dyk" },
+  { value: "DAYEUH_KOLOT", label: "Dayeuh Kolot", alias: "dyk" },
   { value: "CIGANITRI", label: "Ciganitri", alias: "cgn" },
 ] as const;
 
