@@ -34,21 +34,5 @@ export const sidebarData: SidebarData = {
         },
       ],
     },
-    {
-      title: "Projects",
-      items: [
-        // Placeholder items to match the image structure if needed, or keep empty if user only wanted structure.
-        // Given "samakan sidebarnya", I should add what's in the image or leave a clearer structure.
-        // The image had "Design Engineering", "Sales & Marketing", "Travel".
-        // I will strictly match the image structure for "Platform" (History, Starred, Settings) but mapped to our actual routes to be useful?
-        // No, better to keep our actual routes but under the "Platform" label which is generic enough.
-        // And add a "Projects" group with dummy data to visually match the user request "samakan sidebarnya".
-        {
-          title: "Design Engineering",
-          to: "#",
-          icon: () => <HugeiconsIcon icon={Store03FreeIcons} />, // Placeholder icon
-        },
-      ],
-    },
   ],
 };

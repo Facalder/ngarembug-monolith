@@ -18,6 +18,8 @@ export default function CafePage() {
         apiEndpoint="cafes"
         columns={cafeColumns}
         searchPlaceholder="Search name or description..."
+        editHref="/dashboard/cafes"
+        canDelete
       />
     </>
   );

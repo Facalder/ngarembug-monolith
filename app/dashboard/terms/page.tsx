@@ -11,13 +11,15 @@ export default function TermsPage() {
                 title="Syarat dan Ketentuan"
                 subtitle="Kelola data syarat dan ketentuan"
                 createLabel="Tambah Syarat & Ketentuan"
-                createHref="/dashboard/terms/create"
+                createHref="/dashboard/terms/new"
             />
 
             <DataTable
                 apiEndpoint="terms"
                 columns={termsColumns}
                 searchPlaceholder="Search name or description..."
+                editHref="/dashboard/terms"
+                canDelete
             />
         </>
     );

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AlertCircleIcon,
   ArrowDown01Icon,
   ArrowUp01Icon,
   Delete01Icon,
@@ -11,30 +12,35 @@ import {
   Sorting05Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type * as React from "react";
-import useSWR from "swr";
+import Link from "next/link";
+import * as React from "react";
+import { toast } from "sonner";
+import useSWR, { useSWRConfig } from "swr";
+import useSWRMutation from "swr/mutation";
+import { AlertConfirmModal } from "@/components/modal/alert-confirm-modal";
+import { TablePagination } from "@/components/table/table-pagination";
+import { type Filter, TableToolbar } from "@/components/table/table-toolbar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Empty,
   EmptyContent,
+  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher, swrConfig } from "@/lib/swr";
+import { fetcher, mutationFetcher, swrConfig } from "@/lib/swr";
+import { useTableState } from "@/lib/use-table";
 import { cn } from "@/lib/utils";
-import { TablePagination } from "./table-pagination";
-import { type Filter, TableToolbar } from "./table-toolbar";
-import { useTableState } from "./use-table";
 
 export type Column<T> = {
   key: keyof T | string;
@@ -52,6 +58,93 @@ export interface DataTableProps<T> {
   renderRowAction?: (row: T) => React.ReactNode;
   searchPlaceholder?: string;
   filters?: Filter[];
+  editHref?: string; // If provided, shows Edit button linking to {editHref}/{id}
+  canDelete?: boolean; // If true, shows Delete button and handles deletion via apiEndpoint
+}
+
+interface RowActionsProps {
+  id: string | number;
+  apiEndpoint: string;
+  editHref?: string;
+  canDelete?: boolean;
+}
+
+function RowActions({ id, apiEndpoint, editHref, canDelete }: RowActionsProps) {
+  const [openDelete, setOpenDelete] = React.useState(false);
+  const { mutate } = useSWRConfig();
+
+  // Normalize endpoint for mutation
+  const endpoint = apiEndpoint.startsWith("/")
+    ? apiEndpoint
+    : `/${apiEndpoint}`;
+
+  const { trigger, isMutating } = useSWRMutation(
+    `${endpoint}/${id}`,
+    mutationFetcher,
+  );
+
+  const handleDelete = async () => {
+    try {
+      await trigger({ method: "DELETE" });
+      toast.success("Data berhasil dihapus");
+      // Invalidate any cache matching the endpoint
+      mutate((key) => typeof key === "string" && key.includes(endpoint));
+      setOpenDelete(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Gagal menghapus data");
+    }
+  };
+
+  if (!editHref && !canDelete) return null;
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <HugeiconsIcon icon={MoreHorizontalIcon} className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          {editHref && (
+            <DropdownMenuItem asChild>
+              <Link href={`${editHref}/${id}`}>
+                <HugeiconsIcon
+                  icon={PencilEdit01Icon}
+                  className="mr-2 h-4 w-4"
+                />
+                Edit
+              </Link>
+            </DropdownMenuItem>
+          )}
+          {canDelete && (
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={() => setOpenDelete(true)}
+            >
+              <HugeiconsIcon icon={Delete01Icon} className="mr-2 h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {canDelete && (
+        <AlertConfirmModal
+          isOpen={openDelete}
+          onOpenChange={setOpenDelete}
+          onConfirm={handleDelete}
+          loading={isMutating}
+          title="Hapus Data?"
+          description="Tindakan ini tidak dapat dibatalkan. Data akan dihapus secara permanen."
+          confirmText="Hapus"
+        />
+      )}
+    </>
+  );
 }
 
 export function DataTable<T extends { id: string | number }>({
@@ -60,6 +153,8 @@ export function DataTable<T extends { id: string | number }>({
   renderRowAction,
   searchPlaceholder,
   filters,
+  editHref,
+  canDelete,
 }: DataTableProps<T>) {
   const { searchParams, setSort } = useTableState();
 
@@ -68,10 +163,14 @@ export function DataTable<T extends { id: string | number }>({
   const queryString = searchParams.toString();
   const endpoint = apiEndpoint.startsWith("/")
     ? apiEndpoint
-    : `/api/v1/${apiEndpoint}`;
+    : `/${apiEndpoint}`;
   const swrKey = `${endpoint}${queryString ? `?${queryString}` : ""}`;
 
-  const { data, error, isLoading } = useSWR(swrKey, fetcher, swrConfig);
+  const { data, error, isLoading, mutate, isValidating } = useSWR(
+    swrKey,
+    fetcher,
+    swrConfig,
+  );
 
   const rows = (data?.data as T[]) || [];
   const pagination = data?.pagination || {
@@ -107,16 +206,14 @@ export function DataTable<T extends { id: string | number }>({
     );
   };
 
-  if (error) {
-    return <div className="p-4 text-destructive">Failed to load data.</div>;
-  }
-
   return (
     <div className="space-y-4">
       <TableToolbar
         searchPlaceholder={searchPlaceholder}
         filters={filters}
         columns={columns}
+        onRefresh={() => mutate()}
+        isRefreshing={isValidating}
       />
       <div className="rounded-md border border-border overflow-hidden">
         <div className="relative w-full overflow-auto">
@@ -191,6 +288,42 @@ export function DataTable<T extends { id: string | number }>({
                     </td>
                   </tr>
                 ))
+              ) : error ? (
+                <tr>
+                  <td colSpan={columns.length + 1} className="h-24 text-center">
+                    <Empty>
+                      <EmptyHeader>
+                        <EmptyMedia
+                          variant="icon"
+                          className="bg-destructive/10 text-destructive"
+                        >
+                          <HugeiconsIcon icon={AlertCircleIcon} />
+                        </EmptyMedia>
+                        <EmptyTitle>Gagal memuat data</EmptyTitle>
+                        <EmptyDescription>
+                          Terjadi kesalahan saat mengambil data. Silakan coba
+                          lagi.
+                        </EmptyDescription>
+                      </EmptyHeader>
+                      <EmptyContent>
+                        <Button
+                          variant="outline"
+                          disabled={isValidating}
+                          onClick={() => {
+                            console.clear();
+                            mutate();
+                          }}
+                        >
+                          <HugeiconsIcon
+                            icon={ReloadIcon}
+                            className={cn(isValidating && "animate-spin")}
+                          />
+                          {isValidating ? "Memuat..." : "Muat Ulang"}
+                        </Button>
+                      </EmptyContent>
+                    </Empty>
+                  </td>
+                </tr>
               ) : rows.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length + 1} className="h-24 text-center">
@@ -199,83 +332,62 @@ export function DataTable<T extends { id: string | number }>({
                         <EmptyMedia variant="icon">
                           <HugeiconsIcon icon={FileNotFoundIcon} />
                         </EmptyMedia>
-                        <EmptyTitle>Tidak ada data yang ditemukan</EmptyTitle>
+                        <EmptyTitle>Belum ada data</EmptyTitle>
+                        <EmptyDescription>
+                          Data yang Anda cari tidak ditemukan atau belum
+                          ditambahkan.
+                        </EmptyDescription>
                       </EmptyHeader>
                       <EmptyContent>
-                        <Button variant="outline">
-                          <HugeiconsIcon icon={ReloadIcon} />
-                          Perbarui Data
+                        <Button
+                          variant="outline"
+                          disabled={isValidating}
+                          onClick={() => mutate()}
+                        >
+                          <HugeiconsIcon
+                            icon={ReloadIcon}
+                            className={cn(isValidating && "animate-spin")}
+                          />
+                          {isValidating ? "Memuat..." : "Perbarui Data"}
                         </Button>
                       </EmptyContent>
                     </Empty>
                   </td>
                 </tr>
-              ) : (
-                rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                  >
-                    {columns.map((col) => (
-                      <td
-                        key={String(col.key)}
-                        className={cn(
-                          "p-4 align-middle [&:has([role=checkbox])]:pr-0",
-                          col.className,
-                          getStickyClass(col),
-                        )}
-                        style={getStickyStyle(col)}
-                      >
-                        {col.render
-                          ? col.render(row)
-                          : (row[col.key as keyof T] as React.ReactNode)}
-                      </td>
-                    ))}
-                    <td className="p-4 align-middle sticky right-0 z-10 bg-background border-l shadow-[-1px_0_0_0_var(--color-border)]">
-                      {renderRowAction ? (
-                        renderRowAction(row)
-                      ) : (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <HugeiconsIcon
-                                icon={MoreHorizontalIcon}
-                                className="h-4 w-4"
-                              />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                navigator.clipboard.writeText(String(row.id))
-                              }
-                            >
-                              Copy ID
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                              <HugeiconsIcon
-                                icon={PencilEdit01Icon}
-                                className="mr-2 h-4 w-4"
-                              />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive focus:text-destructive">
-                              <HugeiconsIcon
-                                icon={Delete01Icon}
-                                className="mr-2 h-4 w-4"
-                              />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+              ) : (rows.map((row) => (
+                <tr
+                  key={row.id}
+                  className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                >
+                  {columns.map((col) => (
+                    <td
+                      key={String(col.key)}
+                      className={cn(
+                        "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+                        col.className,
+                        getStickyClass(col),
                       )}
+                      style={getStickyStyle(col)}
+                    >
+                      {col.render
+                        ? col.render(row)
+                        : (row[col.key as keyof T] as React.ReactNode)}
                     </td>
-                  </tr>
-                ))
-              )}
+                  ))}
+                  <td className="p-4 align-middle sticky right-0 z-10 bg-background border-l shadow-[-1px_0_0_0_var(--color-border)]">
+                    {renderRowAction ? (
+                      renderRowAction(row)
+                    ) : (
+                      <RowActions
+                        id={row.id}
+                        apiEndpoint={apiEndpoint}
+                        editHref={editHref}
+                        canDelete={canDelete}
+                      />
+                    )}
+                  </td>
+                </tr>
+              )))}
             </tbody>
           </table>
         </div>

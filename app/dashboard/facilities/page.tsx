@@ -11,13 +11,15 @@ export default function FacilitiesPage() {
                 title="Fasilitas"
                 subtitle="Kelola data fasilitas"
                 createLabel="Tambah Fasilitas"
-                createHref="/dashboard/facilities/create"
+                createHref="/dashboard/facilities/new"
             />
 
             <DataTable
                 apiEndpoint="facilities"
                 columns={facilitiesColumns}
                 searchPlaceholder="Search name or description..."
+                editHref="/dashboard/facilities"
+                canDelete={true}
             />
         </>
     );

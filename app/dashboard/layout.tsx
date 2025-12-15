@@ -20,7 +20,7 @@ export default function DashboardLayout({
         <div className="flex flex-1 overflow-hidden">
           <AppSidebar />
           <SidebarInset>
-            <div className="flex flex-col flex-1 gap-4 p-4 md:p-8 lg:p-10 min-h-0 min-w-0">
+            <div className="flex flex-col flex-1 p-4 md:p-8 lg:p-10 min-h-0 min-w-0">
               {children}
             </div>
             <Toaster richColors theme="light" />

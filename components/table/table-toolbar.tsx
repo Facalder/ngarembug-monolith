@@ -1,6 +1,10 @@
 "use client";
 
-import { FilterHorizontalIcon, Search01Icon } from "@hugeicons/core-free-icons";
+import {
+  FilterHorizontalIcon,
+  ReloadIcon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -14,7 +18,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useTableState } from "./use-table";
+import { cn } from "@/lib/utils";
+import { useTableState } from "../../lib/use-table";
 
 export type FilterOption = {
   label: string;
@@ -38,8 +43,10 @@ import {
   VISITOR_TYPE_OPTIONS,
 } from "@/globals/data-options";
 
-const FILTER_MAPPING: Record<string, { label: string; options: readonly any[] }> =
-{
+const FILTER_MAPPING: Record<
+  string,
+  { label: string; options: readonly any[] }
+> = {
   cafeType: { label: "Tipe Kafe", options: CAFE_TYPE_OPTIONS },
   region: { label: "Wilayah", options: REGION_OPTIONS },
   priceRange: { label: "Rentang Harga", options: PRICE_RANGE_OPTIONS },
@@ -55,12 +62,16 @@ interface TableToolbarProps {
   filters?: Filter[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns?: { key: string | number | symbol }[];
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 export function TableToolbar({
   searchPlaceholder = "Search...",
   filters = [],
   columns = [],
+  onRefresh,
+  isRefreshing,
 }: TableToolbarProps) {
   const { searchParams, setSearch, setFilter } = useTableState();
 
@@ -101,6 +112,21 @@ export function TableToolbar({
             className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
           />
         </div>
+        {onRefresh && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 gap-1"
+            disabled={isRefreshing}
+            onClick={onRefresh}
+          >
+            <HugeiconsIcon
+              icon={ReloadIcon}
+              className={cn("h-4 w-4", isRefreshing && "animate-spin")}
+            />
+            Refresh
+          </Button>
+        )}
 
         {activeFilters.map((filter) => (
           <DropdownMenu key={filter.key}>

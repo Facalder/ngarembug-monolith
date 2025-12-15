@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTableState } from "./use-table";
+import { useTableState } from "@/lib/use-table";
 
 interface TablePaginationProps {
   total: number;
