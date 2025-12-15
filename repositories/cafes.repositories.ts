@@ -6,8 +6,10 @@ import {
   desc,
   eq,
   gte,
+  ilike,
   inArray,
   lte,
+  or,
   type SQL,
   sql,
 } from "drizzle-orm";
@@ -31,9 +33,15 @@ export const findCafes = cache(async (params: CafeQuery) => {
     orderDir = "desc",
     page = 1,
     limit = 10,
+    search,
   } = params;
 
   const conditions = [
+    search &&
+      or(
+        ilike(cafes.name, `%${search}%`),
+        ilike(cafes.description, `%${search}%`),
+      ),
     id && eq(cafes.id, id),
     slug && eq(cafes.slug, slug),
     region?.length && inArray(cafes.region, region),
@@ -46,6 +54,7 @@ export const findCafes = cache(async (params: CafeQuery) => {
   ].filter(Boolean) as SQL[];
 
   const orderCol = {
+    name: cafes.name,
     price: cafes.pricePerPerson,
     rating: cafes.averageRating,
     reviews: cafes.totalReviews,

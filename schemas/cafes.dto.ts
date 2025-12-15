@@ -89,6 +89,7 @@ export const cafeSchema = z.object({
 export const cafeQuerySchema = z.object({
   id: z.string().optional(),
   slug: z.string().optional(),
+  search: z.string().optional(),
 
   region: createAliasSchema<Region>(
     regionValues as unknown as Region[],
@@ -124,6 +125,7 @@ export const cafeQuerySchema = z.object({
 
   orderBy: z
     .enum([
+      "name",
       "price",
       "rating",
       "reviews",
