@@ -5,18 +5,6 @@ import { DataTable } from "@/components/table";
 import { cafeColumns } from "@/components/table-columns/cafe-table-columns";
 
 export default function CafePage() {
-  const filters = [
-    {
-      key: "types",
-      label: "Type",
-      options: [
-        { label: "Indoor", value: "INDOOR_CAFE" },
-        { label: "Outdoor", value: "OUTDOOR_CAFE" },
-        { label: "Industrial", value: "INDUSTRIAL_CAFE" },
-      ],
-    },
-  ];
-
   return (
     <>
       <DashboardTitle
@@ -30,7 +18,6 @@ export default function CafePage() {
         apiEndpoint="cafes"
         columns={cafeColumns}
         searchPlaceholder="Search name or description..."
-        filters={filters}
       />
     </>
   );

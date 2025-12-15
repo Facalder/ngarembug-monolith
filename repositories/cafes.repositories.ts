@@ -23,17 +23,19 @@ export const findCafes = cache(async (params: CafeQuery) => {
     id,
     slug,
     region,
-    types,
+    cafeType,
     priceRange,
     minPrice,
     maxPrice,
     minReviews,
+    averageRating,
     minAvgRating,
     orderBy = "created_at",
     orderDir = "desc",
     page = 1,
     limit = 10,
     search,
+    contentStatus,
   } = params;
 
   const conditions = [
@@ -45,11 +47,32 @@ export const findCafes = cache(async (params: CafeQuery) => {
     id && eq(cafes.id, id),
     slug && eq(cafes.slug, slug),
     region?.length && inArray(cafes.region, region),
-    types?.length && inArray(cafes.cafeType, types),
+    cafeType?.length && inArray(cafes.cafeType, cafeType),
+    contentStatus?.length && inArray(cafes.contentStatus, contentStatus),
     priceRange?.length && inArray(cafes.priceRange, priceRange),
     minPrice !== undefined && gte(cafes.pricePerPerson, minPrice),
     maxPrice !== undefined && lte(cafes.pricePerPerson, maxPrice),
     minReviews !== undefined && gte(cafes.totalReviews, minReviews),
+    averageRating?.length &&
+      inArray(
+        sql`FLOOR(${cafes.averageRating})`,
+        averageRating.map((r) => {
+          switch (r) {
+            case "ONE":
+              return 1;
+            case "TWO":
+              return 2;
+            case "THREE":
+              return 3;
+            case "FOUR":
+              return 4;
+            case "FIVE":
+              return 5;
+            default:
+              return 0;
+          }
+        }),
+      ),
     minAvgRating !== undefined && gte(cafes.averageRating, minAvgRating),
   ].filter(Boolean) as SQL[];
 

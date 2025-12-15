@@ -105,14 +105,15 @@ export function useTableState(_options: UseTableStateOptions = {}) {
   const setFilter = useCallback(
     (key: string, values: string[] | string | null) => {
       const params = new URLSearchParams(searchParams);
-      params.delete(key);
-
-      if (Array.isArray(values)) {
-        values.forEach((v) => {
-          params.append(key, v);
-        });
-      } else if (values) {
-        params.set(key, values);
+      
+      if (!values || (Array.isArray(values) && values.length === 0)) {
+        params.delete(key);
+      } else if (Array.isArray(values)) {
+        // Join with % and lowercase
+        const joined = values.map((v) => v.toLowerCase()).join("%");
+        params.set(key, joined);
+      } else {
+        params.set(key, String(values).toLowerCase());
       }
 
       updateUrl(params, true);

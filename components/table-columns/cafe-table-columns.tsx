@@ -1,4 +1,5 @@
 import type { Column } from "@/components/table/table";
+import { Badge } from "@/components/ui/badge";
 import type { cafes } from "@/db/schema/cafes.schema";
 
 export type Cafe = typeof cafes.$inferSelect;
@@ -37,7 +38,7 @@ export const cafeColumns: Column<Cafe>[] = [
   {
     key: "address",
     label: "Address",
-    className: "max-w-[300px] truncate",
+    className: "max-w-[300px] whitespace-normal",
   },
   {
     key: "priceRange",
@@ -88,4 +89,25 @@ export const cafeColumns: Column<Cafe>[] = [
       </span>
     ),
   },
+  {
+    key: "contentStatus",
+    label: "Status",
+    sortable: true,
+    render: (row) => {
+      const status = (row.contentStatus || "draft").toLowerCase()
+
+      return (
+        <Badge
+          variant={status === "draft" ? "secondary" : "default"}
+          className={
+            status === "archived"
+              ? "border bg-secondary text-muted-foreground"
+              : ""
+          }
+        >
+          {status}
+        </Badge>
+      )
+    },
+  }
 ];

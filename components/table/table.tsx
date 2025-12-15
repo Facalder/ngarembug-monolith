@@ -113,7 +113,11 @@ export function DataTable<T extends { id: string | number }>({
 
   return (
     <div className="space-y-4">
-      <TableToolbar searchPlaceholder={searchPlaceholder} filters={filters} />
+      <TableToolbar
+        searchPlaceholder={searchPlaceholder}
+        filters={filters}
+        columns={columns}
+      />
       <div className="rounded-md border border-border overflow-hidden">
         <div className="relative w-full overflow-auto">
           <table className="w-full caption-bottom text-sm">

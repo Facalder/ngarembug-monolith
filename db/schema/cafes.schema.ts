@@ -8,7 +8,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { cafeType, priceRange, region } from "@/db/schema/enums.schema";
+import { cafeType, contentStatus, priceRange, region } from "@/db/schema/enums.schema";
 
 import { createId } from "@/lib/cuid";
 
@@ -45,6 +45,8 @@ const cafesTable = pgTable.withRLS(
       .default(0)
       .notNull(),
     totalReviews: integer("total_reviews").default(0).notNull(),
+
+    contentStatus: contentStatus("content_status").notNull().default("PUBLISHED"),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")

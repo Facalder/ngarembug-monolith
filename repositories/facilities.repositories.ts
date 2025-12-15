@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, desc, eq, ilike, or, type SQL, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, or, type SQL, sql } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db";
 import { facilities } from "@/db/schema/facilities.schema";
@@ -15,6 +15,7 @@ export const findFacilities = cache(async (params: FacilityQuery) => {
     orderDir = "desc",
     page = 1,
     limit = 10,
+    contentStatus,
   } = params;
 
   const conditions = [
@@ -25,6 +26,7 @@ export const findFacilities = cache(async (params: FacilityQuery) => {
         ilike(facilities.name, `%${keyword}%`),
         ilike(facilities.description, `%${keyword}%`),
       ),
+    contentStatus?.length && inArray(facilities.contentStatus, contentStatus),
   ].filter(Boolean) as SQL[];
 
   const orderCol = {

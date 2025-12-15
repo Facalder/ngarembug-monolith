@@ -3,8 +3,10 @@ import { cafeType, priceRange, region } from "@/db/schema/enums.schema";
 
 import {
   CAFE_TYPE_OPTIONS,
+  CONTENT_STATUS_OPTIONS,
   PRICE_RANGE_OPTIONS,
   REGION_OPTIONS,
+  STAR_RATING_OPTIONS,
 } from "@/globals/data-options";
 
 const cafeTypeValues = cafeType.enumValues;
@@ -23,11 +25,21 @@ const PRICE_ALIAS = Object.fromEntries(
   PRICE_RANGE_OPTIONS.map((opt) => [opt.alias, opt.value]),
 );
 
+const STATUS_ALIAS = Object.fromEntries(
+  CONTENT_STATUS_OPTIONS.map((opt) => [opt.alias, opt.value]),
+);
+
+const RATING_ALIAS = Object.fromEntries(
+  STAR_RATING_OPTIONS.map((opt) => [opt.alias, opt.value]),
+);
+
 type Region = (typeof REGION_OPTIONS)[number]["value"];
 type CafeType = (typeof CAFE_TYPE_OPTIONS)[number]["value"];
 type PriceRange = (typeof PRICE_RANGE_OPTIONS)[number]["value"];
+type ContentStatus = (typeof CONTENT_STATUS_OPTIONS)[number]["value"];
+type Rating = (typeof STAR_RATING_OPTIONS)[number]["value"];
 
-const createAliasSchema = <T extends string>(
+export const createAliasSchema = <T extends string>(
   validValues: readonly T[],
   aliases: Record<string, T>,
 ) => {
@@ -41,6 +53,7 @@ const createAliasSchema = <T extends string>(
           const lower = item.toLowerCase().trim();
           if (lower in aliases) return aliases[lower];
 
+          // Check if uppercase version is in validValues
           const upper = item.toUpperCase().trim();
           if ((validValues as readonly string[]).includes(upper))
             return upper as T;
@@ -96,7 +109,7 @@ export const cafeQuerySchema = z.object({
     REGION_ALIAS,
   ),
 
-  types: createAliasSchema<CafeType>(
+  cafeType: createAliasSchema<CafeType>(
     cafeTypeValues as unknown as CafeType[],
     TYPE_ALIAS,
   ),
@@ -112,6 +125,12 @@ export const cafeQuerySchema = z.object({
     .number()
     .min(0, "Min reviews must be at least 0")
     .optional(),
+  
+  averageRating: createAliasSchema<Rating>(
+    STAR_RATING_OPTIONS.map((opt) => opt.value) as unknown as Rating[],
+    RATING_ALIAS,
+  ),
+
   minAvgRating: z.coerce
     .number()
     .min(0)
@@ -143,6 +162,11 @@ export const cafeQuerySchema = z.object({
     .min(1, "Limit must be at least 1")
     .max(100, "Limit must be at most 100")
     .default(10),
+
+  contentStatus: createAliasSchema<ContentStatus>(
+    CONTENT_STATUS_OPTIONS.map((opt) => opt.value) as unknown as ContentStatus[],
+    STATUS_ALIAS,
+  ),
 });
 
 export const cafeWithHoursSchema = cafeSchema.extend({

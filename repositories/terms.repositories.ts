@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, desc, eq, ilike, or, type SQL, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, or, type SQL, sql } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db";
 import { terms } from "@/db/schema/terms.schema";
@@ -15,6 +15,7 @@ export const findTerms = cache(async (params: TermQuery) => {
     orderDir = "desc",
     page = 1,
     limit = 10,
+    contentStatus,
   } = params;
 
   const conditions = [
@@ -25,6 +26,7 @@ export const findTerms = cache(async (params: TermQuery) => {
         ilike(terms.name, `%${keyword}%`),
         ilike(terms.description, `%${keyword}%`),
       ),
+    contentStatus?.length && inArray(terms.contentStatus, contentStatus),
   ].filter(Boolean) as SQL[];
 
   const orderCol = {

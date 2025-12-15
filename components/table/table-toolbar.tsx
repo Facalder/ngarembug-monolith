@@ -18,7 +18,7 @@ import { useTableState } from "./use-table";
 
 export type FilterOption = {
   label: string;
-  value: string;
+  value: string | number;
 };
 
 export type Filter = {
@@ -27,16 +27,59 @@ export type Filter = {
   options: FilterOption[];
 };
 
+import {
+  CAFE_TYPE_OPTIONS,
+  CONTENT_STATUS_OPTIONS,
+  DAYS_OPTIONS,
+  PRICE_RANGE_OPTIONS,
+  REGION_OPTIONS,
+  REVIEW_STATUS_OPTIONS,
+  STAR_RATING_OPTIONS,
+  VISITOR_TYPE_OPTIONS,
+} from "@/globals/data-options";
+
+const FILTER_MAPPING: Record<string, { label: string; options: readonly any[] }> =
+{
+  cafeType: { label: "Tipe Kafe", options: CAFE_TYPE_OPTIONS },
+  region: { label: "Wilayah", options: REGION_OPTIONS },
+  priceRange: { label: "Rentang Harga", options: PRICE_RANGE_OPTIONS },
+  contentStatus: { label: "Status", options: CONTENT_STATUS_OPTIONS },
+  reviewStatus: { label: "Status Review", options: REVIEW_STATUS_OPTIONS },
+  averageRating: { label: "Rating", options: STAR_RATING_OPTIONS },
+  visitorType: { label: "Tipe Pengunjung", options: VISITOR_TYPE_OPTIONS },
+  days: { label: "Hari", options: DAYS_OPTIONS },
+};
+
 interface TableToolbarProps {
   searchPlaceholder?: string;
   filters?: Filter[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns?: { key: string | number | symbol }[];
 }
 
 export function TableToolbar({
   searchPlaceholder = "Search...",
   filters = [],
+  columns = [],
 }: TableToolbarProps) {
   const { searchParams, setSearch, setFilter } = useTableState();
+
+  const dynamicFilters: Filter[] = columns
+    .map((col) => {
+      const key = String(col.key);
+      const mapping = FILTER_MAPPING[key];
+      if (mapping) {
+        return {
+          key,
+          label: mapping.label,
+          options: mapping.options as unknown as FilterOption[],
+        };
+      }
+      return null;
+    })
+    .filter((f): f is Filter => f !== null);
+
+  const activeFilters = [...dynamicFilters, ...filters];
 
   // Handle Search
   const handleSearch = useDebouncedCallback((term: string) => {
@@ -59,7 +102,7 @@ export function TableToolbar({
           />
         </div>
 
-        {filters.map((filter) => (
+        {activeFilters.map((filter) => (
           <DropdownMenu key={filter.key}>
             <DropdownMenuTrigger asChild>
               <Button
@@ -72,9 +115,9 @@ export function TableToolbar({
                   className="h-4 w-4"
                 />
                 {filter.label}
-                {searchParams.getAll(filter.key).length > 0 && (
+                {searchParams.get(filter.key) && (
                   <span className="bg-primary text-primary-foreground ml-1 flex h-4 w-4 items-center justify-center rounded-sm text-[10px] p-0.5">
-                    {searchParams.getAll(filter.key).length}
+                    {searchParams.get(filter.key)?.split("%").length}
                   </span>
                 )}
               </Button>
@@ -83,17 +126,32 @@ export function TableToolbar({
               <DropdownMenuLabel>Filter by {filter.label}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {filter.options.map((option) => {
-                const currentValues = searchParams.getAll(filter.key);
-                const isChecked = currentValues.includes(option.value);
+                // Get raw value, split by % if present, ensure array
+                const rawParam = searchParams.get(filter.key);
+                const currentValues = rawParam ? rawParam.split("%") : [];
+
+                // Check case-insensitively
+                const isChecked = currentValues.some(
+                  (v) => v.toLowerCase() === String(option.value).toLowerCase(),
+                );
 
                 return (
                   <DropdownMenuCheckboxItem
                     key={option.value}
                     checked={isChecked}
                     onCheckedChange={(checked) => {
-                      const next = checked
-                        ? [...currentValues, option.value]
-                        : currentValues.filter((v) => v !== option.value);
+                      const valueStr = String(option.value);
+                      // Filter logic: we work with the original values but comparison is case-insensitive
+                      // We'll reconstruct the array
+                      let next: string[];
+
+                      if (checked) {
+                        next = [...currentValues, valueStr];
+                      } else {
+                        next = currentValues.filter(
+                          (v) => v.toLowerCase() !== valueStr.toLowerCase(),
+                        );
+                      }
                       setFilter(filter.key, next);
                     }}
                   >
@@ -101,7 +159,7 @@ export function TableToolbar({
                   </DropdownMenuCheckboxItem>
                 );
               })}
-              {searchParams.getAll(filter.key).length > 0 && (
+              {searchParams.get(filter.key) && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuCheckboxItem
