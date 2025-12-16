@@ -57,3 +57,14 @@ export const DAYS_OPTIONS = [
   { value: 5, label: "Jumat" },
   { value: 6, label: "Sabtu" },
 ] as const;
+
+export const FACILITIES_OPTIONS = [
+  "Wifi",
+  "Proyektor",
+  "Smart TV",
+  "Whiteboard",
+  "Parkir Gratis",
+  "AC",
+  "Musholla",
+  "Meeting Room",
+] as const;
