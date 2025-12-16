@@ -46,11 +46,6 @@ export async function PUT(
     }
 
     const body = await request.json();
-    // Validate body. updateCafeSchema expects `id` in body usually for partials or separate.
-    // Our repository `updateCafe` takes (id, data). DTO has `id` in `updateCafeSchema`.
-    // Let's ensure id matches or just parse body.
-
-    // We add ID to body to validate with schema if schema requires it, or just validate fields.
     const parsedData = updateCafeSchema.parse({ ...body, id });
 
     const updatedCafe = await updateCafe(id, parsedData);

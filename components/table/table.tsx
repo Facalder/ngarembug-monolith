@@ -157,29 +157,27 @@ export function DataTable<T extends { id: string | number }>({
   canDelete,
 }: DataTableProps<T>) {
   const { searchParams, setSort } = useTableState();
+  const searchParamsString = React.useMemo(
+    () => searchParams?.toString() || "",
+    [searchParams],
+  );
 
   // Construct URL with params for SWR key
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <udah ikutin ajah>
   const swrKey = React.useMemo(() => {
-    // Explicitly pick only relevant keys to avoid unstable references or noise
-    const params = new URLSearchParams();
-    const page = searchParams.get("page") || "1";
-    const limit = searchParams.get("limit") || "10";
-    const search = searchParams.get("search") || "";
-    const orderBy = searchParams.get("orderBy") || "";
-    const orderDir = searchParams.get("orderDir") || "";
+    // Use all search params to ensure all filters (including dynamic ones) are passed to API
+    const params = new URLSearchParams(searchParams.toString());
 
-    if (page) params.set("page", page);
-    if (limit) params.set("limit", limit);
-    if (search) params.set("search", search);
-    if (orderBy) params.set("orderBy", orderBy);
-    if (orderDir) params.set("orderDir", orderDir);
+    // Ensure valid defaults for critical params if missing (optional, API handles it too)
+    if (!params.has("page")) params.set("page", "1");
+    if (!params.has("limit")) params.set("limit", "10");
 
     const queryString = params.toString();
     const endpoint = apiEndpoint.startsWith("/")
       ? apiEndpoint
       : `/${apiEndpoint}`;
     return `${endpoint}${queryString ? `?${queryString}` : ""}`;
-  }, [searchParams, apiEndpoint]);
+  }, [searchParamsString, apiEndpoint]);
 
   const { data, error, isLoading, mutate, isValidating } = useSWR(
     swrKey,

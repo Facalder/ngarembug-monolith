@@ -3,8 +3,11 @@
 import DashboardTitle from "@/components/dashboard-title";
 import { DataTable } from "@/components/table";
 import { cafeColumns } from "@/components/table-columns/cafe-table-columns";
+import { useCafeTableFilters } from "@/hooks/use-cafe-filters";
 
 export default function CafePage() {
+  const { filters } = useCafeTableFilters();
+
   return (
     <>
       <DashboardTitle
@@ -20,6 +23,7 @@ export default function CafePage() {
         searchPlaceholder="Search name or description..."
         editHref="/dashboard/cafes"
         canDelete
+        filters={filters}
       />
     </>
   );

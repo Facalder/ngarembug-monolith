@@ -48,7 +48,6 @@ export const createCafeSchema = z.object({
   gallery: z.array(z.string()).optional(),
   menu: z.array(z.string()).optional(),
 
-
   contentStatus: z.enum(contentStatus.enumValues).default("DRAFT"),
   facilities: z
     .array(
@@ -108,7 +107,17 @@ const createAliasSchema = <T extends string>(
       if (!val) return undefined;
       const inputs = Array.isArray(val) ? val : val.split(",");
       const mapped = inputs
-        .map((item) => aliasMap[item] || item)
+        .map((item) => {
+          // Normalize input
+          // 1. Try direct match in alias map (e.g. "skb" -> "SUKABIRUS")
+          // 2. Try lowercase match in alias map (e.g. "SKB" -> "skb" -> "SUKABIRUS")
+          // 3. Try toUpperCase (for enum values like "bojongsoang" -> "BOJONGSOANG")
+          return (
+            aliasMap[item] ||
+            aliasMap[item.toLowerCase()] ||
+            item.toUpperCase()
+          );
+        })
         .filter((item): item is T => values.includes(item as T));
 
       return mapped.length > 0 ? mapped : undefined;
@@ -156,14 +165,14 @@ export const cafeQuerySchema = z.object({
     .optional()
     .transform((val) => {
       if (!val) return undefined;
-      return Array.isArray(val) ? val : val.split("%");
+      return Array.isArray(val) ? val : val.split(",");
     }),
   terms: z
     .union([z.string(), z.array(z.string())])
     .optional()
     .transform((val) => {
       if (!val) return undefined;
-      return Array.isArray(val) ? val : val.split("%");
+      return Array.isArray(val) ? val : val.split(",");
     }),
 
   contentStatus: createAliasSchema<ContentStatus>(

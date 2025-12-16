@@ -143,7 +143,7 @@ export function TableToolbar({
                 {filter.label}
                 {searchParams.get(filter.key) && (
                   <span className="bg-primary text-primary-foreground ml-1 flex h-4 w-4 items-center justify-center rounded-sm text-[10px] p-0.5">
-                    {searchParams.get(filter.key)?.split("%").length}
+                    {searchParams.get(filter.key)?.split(",").length}
                   </span>
                 )}
               </Button>
@@ -152,11 +152,11 @@ export function TableToolbar({
               <DropdownMenuLabel>Filter by {filter.label}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {filter.options.map((option) => {
-                // Get raw value, split by % if present, ensure array
+                // Get raw value, split by , if present, ensure array
                 const rawParam = searchParams.get(filter.key);
-                const currentValues = rawParam ? rawParam.split("%") : [];
+                const currentValues = rawParam ? rawParam.split(",") : [];
 
-                // Check case-insensitively
+                // Check case-insensitively to support lowercase URL params
                 const isChecked = currentValues.some(
                   (v) => v.toLowerCase() === String(option.value).toLowerCase(),
                 );
@@ -166,16 +166,25 @@ export function TableToolbar({
                     key={option.value}
                     checked={isChecked}
                     onCheckedChange={(checked) => {
-                      const valueStr = String(option.value);
-                      // Filter logic: we work with the original values but comparison is case-insensitive
-                      // We'll reconstruct the array
+                      // Usahakan URL param lowercase semua
+                      const valueStr = String(option.value).toLowerCase();
                       let next: string[];
 
+                      // We need to work with lowercase values for comparison/filtering to be consistent
+                      const currentValuesLower = currentValues.map((v) =>
+                        v.toLowerCase(),
+                      );
+
                       if (checked) {
-                        next = [...currentValues, valueStr];
+                        // Add if not present (although Dropdown handles display, logic needs to be safe)
+                        if (!currentValuesLower.includes(valueStr)) {
+                          next = [...currentValues, valueStr];
+                        } else {
+                          next = currentValues;
+                        }
                       } else {
                         next = currentValues.filter(
-                          (v) => v.toLowerCase() !== valueStr.toLowerCase(),
+                          (v) => v.toLowerCase() !== valueStr,
                         );
                       }
                       setFilter(filter.key, next);

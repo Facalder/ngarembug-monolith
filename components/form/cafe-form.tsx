@@ -228,8 +228,6 @@ export function CafeForm({ initialData }: CafeFormProps) {
     return apiMap;
   }, [termsData, watchedTerms]);
 
-
-
   const name = form.watch("name");
   // Auto-generate slug
   useEffect(() => {

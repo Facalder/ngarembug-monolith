@@ -14,8 +14,6 @@ export default async function EditCafePage({ params }: EditCafePageProps) {
 
   const cafe = await getCafeById(id);
 
-
-
   if (!cafe) {
     notFound();
   }

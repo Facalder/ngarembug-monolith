@@ -2,36 +2,22 @@
   "version": "8",
   "dialect": "postgres",
   "id": "0ded56a9-5fc5-4085-831e-c55eab5f5f6e",
-  "prevIds": [
-    "232a06b0-127b-46d3-bc6a-aa3d0bcacc4c"
-  ],
+  "prevIds": ["232a06b0-127b-46d3-bc6a-aa3d0bcacc4c"],
   "ddl": [
     {
-      "values": [
-        "INDOOR_CAFE",
-        "OUTDOOR_CAFE"
-      ],
+      "values": ["INDOOR_CAFE", "OUTDOOR_CAFE"],
       "name": "CafeType",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "DRAFT",
-        "PUBLISHED",
-        "ARCHIVED"
-      ],
+      "values": ["DRAFT", "PUBLISHED", "ARCHIVED"],
       "name": "ContentStatus",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "LOW",
-        "MEDIUM",
-        "HIGH",
-        "PREMIUM"
-      ],
+      "values": ["LOW", "MEDIUM", "HIGH", "PREMIUM"],
       "name": "PriceRange",
       "entityType": "enums",
       "schema": "public"
@@ -50,35 +36,19 @@
       "schema": "public"
     },
     {
-      "values": [
-        "APPROVED",
-        "REJECTED",
-        "PENDING"
-      ],
+      "values": ["APPROVED", "REJECTED", "PENDING"],
       "name": "ReviewStatus",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "ONE",
-        "TWO",
-        "THREE",
-        "FOUR",
-        "FIVE"
-      ],
+      "values": ["ONE", "TWO", "THREE", "FOUR", "FIVE"],
       "name": "StarRating",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "FAMILY",
-        "COUPLE",
-        "SOLO",
-        "BUSINESS",
-        "FRIENDS"
-      ],
+      "values": ["FAMILY", "COUPLE", "SOLO", "BUSINESS", "FRIENDS"],
       "name": "VisitorType",
       "entityType": "enums",
       "schema": "public"
@@ -1092,14 +1062,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "cafe_id"
-      ],
+      "columns": ["cafe_id"],
       "schemaTo": "public",
       "tableTo": "cafes",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "cafe_opening_hours_cafe_id_cafes_id_fkey",
@@ -1108,9 +1074,7 @@
       "table": "cafe_opening_hours"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "cafe_opening_hours_pkey",
       "schema": "public",
@@ -1118,9 +1082,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "cafes_pkey",
       "schema": "public",
@@ -1128,9 +1090,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "facilities_pkey",
       "schema": "public",
@@ -1138,9 +1098,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "images_pkey",
       "schema": "public",
@@ -1148,9 +1106,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "terms_pkey",
       "schema": "public",
@@ -1159,9 +1115,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "slug"
-      ],
+      "columns": ["slug"],
       "nullsNotDistinct": false,
       "name": "cafes_slug_key",
       "schema": "public",
@@ -1170,9 +1124,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "phone"
-      ],
+      "columns": ["phone"],
       "nullsNotDistinct": false,
       "name": "cafes_phone_key",
       "schema": "public",
@@ -1181,9 +1133,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "email"
-      ],
+      "columns": ["email"],
       "nullsNotDistinct": false,
       "name": "cafes_email_key",
       "schema": "public",
@@ -1192,9 +1142,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "website"
-      ],
+      "columns": ["website"],
       "nullsNotDistinct": false,
       "name": "cafes_website_key",
       "schema": "public",
@@ -1203,9 +1151,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "map_link"
-      ],
+      "columns": ["map_link"],
       "nullsNotDistinct": false,
       "name": "cafes_map_link_key",
       "schema": "public",
@@ -1214,9 +1160,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "name"
-      ],
+      "columns": ["name"],
       "nullsNotDistinct": false,
       "name": "facilities_name_key",
       "schema": "public",
@@ -1225,9 +1169,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "slug"
-      ],
+      "columns": ["slug"],
       "nullsNotDistinct": false,
       "name": "facilities_slug_key",
       "schema": "public",
@@ -1236,9 +1178,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nullsNotDistinct": false,
       "name": "images_id_key",
       "schema": "public",
@@ -1247,9 +1187,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "name"
-      ],
+      "columns": ["name"],
       "nullsNotDistinct": false,
       "name": "terms_name_key",
       "schema": "public",
@@ -1258,9 +1196,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "slug"
-      ],
+      "columns": ["slug"],
       "nullsNotDistinct": false,
       "name": "terms_slug_key",
       "schema": "public",

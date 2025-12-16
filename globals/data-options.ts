@@ -23,6 +23,7 @@ export const REGION_OPTIONS = [
   { value: "BUAH BATU", label: "Buah Batu", alias: "bbt" },
   { value: "DAYEUH_KOLOT", label: "Dayeuh Kolot", alias: "dyk" },
   { value: "CIGANITRI", label: "Ciganitri", alias: "cgn" },
+  { value: "BOJONGSOANG", label: "Bojongsoang", alias: "bjs" },
 ] as const;
 
 export const REVIEW_STATUS_OPTIONS = [

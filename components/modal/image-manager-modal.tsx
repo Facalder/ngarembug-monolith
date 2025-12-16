@@ -85,8 +85,7 @@ export function ImageManagerModal({
   const images: ImageType[] = useMemo(() => {
     if (fetchResult?.data && Array.isArray(fetchResult.data)) {
       return fetchResult.data.filter(
-        (img: ImageType) =>
-          img?.id && img.fileUrl && img.fileName,
+        (img: ImageType) => img?.id && img.fileUrl && img.fileName,
       );
     }
     return [];
@@ -386,7 +385,9 @@ export function ImageManagerModal({
                           }
                           title="Hapus Gambar Permanen?"
                           description={`Anda yakin ingin menghapus ${selectedCount} gambar ini secara permanen dari server? Gambar yang dihapus akan hilang dari semua halaman yang menggunakannya. Tindakan ini tidak dapat dibatalkan.`}
-                          confirmText={isDeleting ? "Menghapus..." : "Hapus Permanen"}
+                          confirmText={
+                            isDeleting ? "Menghapus..." : "Hapus Permanen"
+                          }
                           cancelText="Batal"
                           onConfirm={handleDeleteSelected}
                         />
