@@ -91,7 +91,7 @@ const OptionItem = React.memo(
                 role="option"
                 aria-selected={isSelected}
                 tabIndex={0}
-                className="flex items-center gap-2 px-2 py-1.5 hover:bg-accent rounded-md cursor-pointer select-none transition-colors outline-none focus:bg-accent focus:text-accent-foreground"
+                className="flex items-center gap-2 px-2 py-1.5 hover:bg-secondary rounded-md cursor-pointer select-none transition-colors outline-none focus:bg-accent focus:text-accent-foreground"
                 onClick={() => onToggle(option.value)}
                 onKeyDown={handleKeyDown}
             >
@@ -197,11 +197,22 @@ export function MultiSelect({
         <div className={cn("w-full", className)}>
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <Button
-                        variant="outline"
+                    <div
                         role="combobox"
+                        tabIndex={0}
                         aria-expanded={open}
-                        className="w-full justify-between h-auto min-h-9 py-1.5 bg-transparent  group"
+                        onClick={() => setOpen(!open)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setOpen(!open);
+                            }
+                        }}
+                        className={cn(
+                            "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+                            "h-auto min-h-9 py-1.5 group cursor-pointer", // Custom styles
+                            className
+                        )}
                     >
                         <div className="flex items-center gap-1.5 flex-wrap flex-1 text-left">
                             {selectedOptions.length === 0 ? (
@@ -229,10 +240,10 @@ export function MultiSelect({
                             icon={ArrowDown01Icon}
                             className="ml-2 h-4 w-4 shrink-0 opacity-50 group-data-[state=open]:rotate-180 transition-transform duration-200"
                         />
-                    </Button>
+                    </div>
                 </PopoverTrigger>
                 <PopoverContent
-                    className="w-[var(--radix-popover-trigger-width)] p-0"
+                    className="w-(--radix-popover-trigger-width) p-0"
                     align="start"
                 >
                     <div className="flex flex-col gap-2 p-2">
@@ -254,10 +265,10 @@ export function MultiSelect({
                         <div className="flex flex-col gap-0.5 max-h-[300px] overflow-y-auto">
                             {/* Select All Option */}
                             {/** biome-ignore lint/a11y/useSemanticElements: <Males lagi kalo dibenerin takut berat> */}
-<div
+                            <div
                                 role="button"
                                 tabIndex={0}
-                                className="flex w-full items-center gap-2 px-2 py-1.5 hover:bg-accent rounded-md cursor-pointer select-none font-medium transition-colors outline-none focus:bg-accent focus:text-accent-foreground"
+                                className="flex w-full items-center gap-2 px-2 py-1.5 hover:bg-secondary rounded-md cursor-pointer select-none font-medium transition-colors outline-none focus:bg-accent focus:text-accent-foreground"
                                 onClick={handleSelectAll}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" || e.key === " ") {
@@ -300,6 +311,7 @@ export function MultiSelect({
                         {/* Action Buttons */}
                         <div className="flex gap-2 pt-2 border-t">
                             <Button
+                                type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={handleClearAll}
@@ -310,6 +322,7 @@ export function MultiSelect({
                             </Button>
                             {onAddClick && (
                                 <Button
+                                    type="button"
                                     variant="outline"
                                     size="sm"
                                     onClick={() => {
@@ -323,6 +336,7 @@ export function MultiSelect({
                                 </Button>
                             )}
                             <Button
+                                type="button"
                                 variant="default"
                                 size="sm"
                                 onClick={() => setOpen(false)}

@@ -5,8 +5,9 @@ import { Delete01Icon, ImageAdd01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import * as React from "react";
 import { useEffect, useState } from "react";
-import { type Resolver, useForm } from "react-hook-form";
+import { type Resolver, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import useSWRMutation from "swr/mutation";
@@ -55,6 +56,13 @@ interface CafeFormProps {
   initialData?: CreateCafe & { id: string };
 }
 
+interface FacilityItem {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+}
+
 export function CafeForm({ initialData }: CafeFormProps) {
   const router = useRouter();
   const [submitStatus, setSubmitStatus] = useState<
@@ -74,30 +82,36 @@ export function CafeForm({ initialData }: CafeFormProps) {
   );
 
   // Dynamic SWR key
-  const CAFES_ENDPOINT = "/api/v1/cafes"; // Assuming standard API path
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL || "";
+  const API_PATH = BASE_URL.includes("api/v1") ? "" : "/api/v1";
+  const CAFES_ENDPOINT = `${BASE_URL}${API_PATH}/cafes`;
+  // Assuming standard API path
   const key = initialData?.id
     ? `${CAFES_ENDPOINT}/${initialData.id}`
     : CAFES_ENDPOINT;
 
   const { trigger, isMutating } = useSWRMutation(key, mutationFetcher);
 
-  const { data: facilitiesData } = useSWR(
-    "/api/v1/facilities?limit=100",
+  // Use full paths for clarity and to match buildUrl logic accurately
+  const { data: facilitiesData, error: facilitiesError } = useSWR(
+    `${BASE_URL}${API_PATH}/facilities?limit=100`,
     fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000,
+    },
   );
-  const { data: termsData } = useSWR("/api/v1/terms?limit=100", fetcher);
 
-  const facilitiesOptions =
-    facilitiesData?.data?.map((f: any) => ({
-      label: f.name,
-      value: f.id,
-    })) || [];
-
-  const termsOptions =
-    termsData?.data?.map((t: any) => ({
-      label: t.name,
-      value: t.id,
-    })) || [];
+  const { data: termsData, error: termsError } = useSWR(
+    `${BASE_URL}${API_PATH}/terms?limit=100`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000,
+    },
+  );
 
   const form = useForm<CreateCafe>({
     resolver: zodResolver(createCafeSchema) as Resolver<CreateCafe>,
@@ -140,6 +154,81 @@ export function CafeForm({ initialData }: CafeFormProps) {
       terms: initialData?.terms || [],
     },
   });
+
+  const watchedFacilities =
+    useWatch({ control: form.control, name: "facilities" }) || [];
+  const watchedTerms = useWatch({ control: form.control, name: "terms" }) || [];
+
+  const facilitiesOptions = React.useMemo(() => {
+    const apiOptions =
+      facilitiesData?.data?.map((f: FacilityItem) => ({
+        label: f.name,
+        value: f.id,
+      })) || [];
+
+    const selectedOptions = watchedFacilities.map((f: FacilityItem) => ({
+      label: f.name,
+      value: f.id,
+    }));
+
+    // Merge and deduplicate by value (ID)
+    const combined = [...apiOptions, ...selectedOptions];
+    const unique = Array.from(
+      new Map(combined.map((item) => [item.value, item])).values(),
+    );
+
+    return unique;
+  }, [facilitiesData, watchedFacilities]);
+
+  const termsOptions = React.useMemo(() => {
+    const apiOptions =
+      termsData?.data?.map((t: FacilityItem) => ({
+        label: t.name,
+        value: t.id,
+      })) || [];
+
+    const selectedOptions = watchedTerms.map((t: FacilityItem) => ({
+      label: t.name,
+      value: t.id,
+    }));
+
+    const combined = [...apiOptions, ...selectedOptions];
+    const unique = Array.from(
+      new Map(combined.map((item) => [item.value, item])).values(),
+    );
+
+    return unique;
+  }, [termsData, watchedTerms]);
+
+  // Update Maps to also include watched items for lookup
+  const facilitiesMap = React.useMemo(() => {
+    const apiMap = new Map<string, FacilityItem>(
+      facilitiesData?.data?.map((f: FacilityItem) => [f.id, f]) || [],
+    );
+    watchedFacilities.forEach((f: FacilityItem) => {
+      // Use set to ensure we have the most up to date from form if API is stale, or vice versa?
+      // Actually API data usually has more info, but form has the optimist one.
+      // If API track doesn't have it, we MUST put form one.
+      if (!apiMap.has(f.id)) {
+        apiMap.set(f.id, f);
+      }
+    });
+    return apiMap;
+  }, [facilitiesData, watchedFacilities]);
+
+  const termsMap = React.useMemo(() => {
+    const apiMap = new Map<string, FacilityItem>(
+      termsData?.data?.map((t: FacilityItem) => [t.id, t]) || [],
+    );
+    watchedTerms.forEach((t: FacilityItem) => {
+      if (!apiMap.has(t.id)) {
+        apiMap.set(t.id, t);
+      }
+    });
+    return apiMap;
+  }, [termsData, watchedTerms]);
+
+
 
   const name = form.watch("name");
   // Auto-generate slug
@@ -556,13 +645,27 @@ export function CafeForm({ initialData }: CafeFormProps) {
                       <FormControl>
                         <MultiSelect
                           options={facilitiesOptions}
-                          value={field.value || []}
-                          onChange={field.onChange}
+                          value={field.value?.map((v) => v.id) || []}
+                          onChange={(ids) => {
+                            const newValues = ids
+                              .map((id) => {
+                                const item = facilitiesMap.get(id);
+                                if (!item) return null;
+                                return {
+                                  id: item.id,
+                                  name: item.name,
+                                  slug: item.slug,
+                                  description: item.description || "",
+                                };
+                              })
+                              .filter((v) => v !== null);
+                            field.onChange(newValues);
+                          }}
                           placeholder="Pilih fasilitas..."
                           onAddClick={() => {
                             setGenericConfig({
                               title: "Fasilitas",
-                              endpoint: "/api/v1/facilities",
+                              endpoint: `${BASE_URL}${API_PATH}/facilities`,
                             });
                             setGenericModalOpen(true);
                           }}
@@ -582,13 +685,27 @@ export function CafeForm({ initialData }: CafeFormProps) {
                       <FormControl>
                         <MultiSelect
                           options={termsOptions}
-                          value={field.value || []}
-                          onChange={field.onChange}
+                          value={field.value?.map((v) => v.id) || []}
+                          onChange={(ids) => {
+                            const newValues = ids
+                              .map((id) => {
+                                const item = termsMap.get(id);
+                                if (!item) return null;
+                                return {
+                                  id: item.id,
+                                  name: item.name,
+                                  slug: item.slug,
+                                  description: item.description || "",
+                                };
+                              })
+                              .filter((v) => v !== null);
+                            field.onChange(newValues);
+                          }}
                           placeholder="Pilih ketentuan..."
                           onAddClick={() => {
                             setGenericConfig({
                               title: "Ketentuan",
-                              endpoint: "/api/v1/terms",
+                              endpoint: `${BASE_URL}${API_PATH}/terms`,
                             });
                             setGenericModalOpen(true);
                           }}
@@ -734,7 +851,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
                         {field.value?.map((url, idx) => (
                           <div
                             key={url}
-                            className="relative border rounded-md overflow-hidden aspect-[3/4] group"
+                            className="relative border rounded-md overflow-hidden aspect-3/4 group"
                           >
                             <Image
                               src={url}
@@ -759,7 +876,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
                             </div>
                           </div>
                         ))}
-                        <div className="flex flex-col justify-center items-center border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 bg-muted/50 hover:bg-muted rounded-md aspect-[3/4] transition-colors cursor-pointer">
+                        <div className="flex flex-col justify-center items-center border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 bg-muted/50 hover:bg-muted rounded-md aspect-3/4 transition-colors cursor-pointer">
                           <Button
                             type="button"
                             variant="ghost"
@@ -815,29 +932,37 @@ export function CafeForm({ initialData }: CafeFormProps) {
         onOpenChange={setGenericModalOpen}
         config={genericConfig}
         onSuccess={(newItem: any) => {
+          const isFacilities =
+            genericConfig?.endpoint.includes("facilities") ?? false;
+
+          const mutateKey = isFacilities
+            ? `${BASE_URL}${API_PATH}/facilities?limit=100`
+            : `${BASE_URL}${API_PATH}/terms?limit=100`;
+
+          const fieldName = isFacilities ? "facilities" : "terms";
+
           // Revalidate list
-          mutate(
-            genericConfig?.endpoint === "/api/v1/facilities"
-              ? "/api/v1/facilities?limit=100"
-              : "/api/v1/terms?limit=100",
-          );
+          mutate(mutateKey);
 
           // Auto-select the new item
-          const fieldName =
-            genericConfig?.endpoint === "/api/v1/facilities"
-              ? "facilities"
-              : "terms";
-
           const currentValues = form.getValues(fieldName as any) || [];
           form.setValue(
             fieldName as any,
-            [...currentValues, newItem.id],
-            { shouldValidate: true }
+            [
+              ...currentValues,
+              {
+                id: newItem.id,
+                name: newItem.name,
+                slug: newItem.slug,
+                description: newItem.description || "",
+              },
+            ],
+            { shouldValidate: true },
           );
 
           toast.success(`${genericConfig?.title} berhasil ditambahkan!`);
         }}
       />
-    </FormLayout >
-  )
+    </FormLayout>
+  );
 }

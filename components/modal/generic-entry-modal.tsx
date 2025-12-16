@@ -53,8 +53,23 @@ export function GenericEntryModal({
     config,
     onSuccess,
 }: GenericEntryModalProps) {
+    // Construct the endpoint URL
+    // Construct the endpoint URL
+    const endpoint = React.useMemo(() => {
+        if (!config?.endpoint) return "";
+        if (config.endpoint.startsWith("http")) return config.endpoint;
+
+        // If endpoint starts with /, return as is. The swr fetcher handles BASE_URL prepending.
+        if (config.endpoint.startsWith("/")) {
+            return config.endpoint;
+        }
+
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL || "";
+        return `${baseUrl}/${config.endpoint}`;
+    }, [config?.endpoint]);
+
     const { trigger, isMutating } = useSWRMutation(
-        config?.endpoint || "",
+        endpoint,
         mutationFetcher,
     );
 
@@ -99,7 +114,6 @@ export function GenericEntryModal({
             const payload = {
                 ...values,
                 slug,
-                contentStatus: "PUBLISHED",
             };
 
             const result = await trigger({ method: "POST", body: payload });

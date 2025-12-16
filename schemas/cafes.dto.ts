@@ -50,9 +50,26 @@ export const createCafeSchema = z.object({
 
 
   contentStatus: z.enum(contentStatus.enumValues).default("DRAFT"),
-
-  facilities: z.array(z.string()).optional(),
-  terms: z.array(z.string()).optional(),
+  facilities: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .default([]),
+  terms: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .default([]),
 });
 
 export const updateCafeSchema = createCafeSchema.partial().extend({
@@ -132,6 +149,22 @@ export const cafeQuerySchema = z.object({
     }),
 
   minAvgRating: z.coerce.number().optional(),
+
+  // Filtering by JSONB slugs (e.g. ?facilities=wifi,parking)
+  facilities: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .transform((val) => {
+      if (!val) return undefined;
+      return Array.isArray(val) ? val : val.split("%");
+    }),
+  terms: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .transform((val) => {
+      if (!val) return undefined;
+      return Array.isArray(val) ? val : val.split("%");
+    }),
 
   contentStatus: createAliasSchema<ContentStatus>(
     CONTENT_STATUS_OPTIONS.map(

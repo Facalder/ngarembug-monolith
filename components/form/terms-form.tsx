@@ -42,7 +42,9 @@ export function TermsForm({ initialData }: TermsFormProps) {
   >(null);
 
   // Dynamic SWR key based on create vs edit mode
-  const TERMS_ENDPOINT = "/terms";
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL || "";
+  const API_PATH = BASE_URL.includes("api/v1") ? "" : "/api/v1";
+  const TERMS_ENDPOINT = `${BASE_URL}${API_PATH}/terms`;
   const key = initialData?.id
     ? `${TERMS_ENDPOINT}/${initialData.id}`
     : TERMS_ENDPOINT;
@@ -89,8 +91,8 @@ export function TermsForm({ initialData }: TermsFormProps) {
         },
       );
 
-      router.refresh();
       router.push("/dashboard/terms");
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error("Gagal memproses permintaan", {

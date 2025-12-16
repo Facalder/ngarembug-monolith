@@ -11,12 +11,12 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
-import { cache } from "react";
+
 import { db } from "@/db";
 import { facilities } from "@/db/schema/facilities.schema";
 import type { FacilityQuery } from "@/schemas/facilities.dto";
 
-export const findFacilities = cache(async (params: FacilityQuery) => {
+export const findFacilities = async (params: FacilityQuery) => {
   const {
     id,
     slug,
@@ -67,7 +67,7 @@ export const findFacilities = cache(async (params: FacilityQuery) => {
       totalPages: Math.ceil(Number(count) / limit),
     },
   };
-});
+};
 
 export const createFacility = async (data: typeof facilities.$inferInsert) => {
   const [newFacility] = await db.insert(facilities).values(data).returning();

@@ -11,13 +11,13 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
-import { cache } from "react";
+
 import { db } from "@/db";
 import { images } from "@/db/schema/images.schema";
 import { getBucketName } from "@/lib/storage-constants";
 import type { CreateImage, ImageQuery } from "@/schemas/images.dto";
 
-export const findImages = cache(async (params: ImageQuery) => {
+export const findImages = async (params: ImageQuery) => {
   const {
     id,
     folder,
@@ -90,18 +90,18 @@ export const findImages = cache(async (params: ImageQuery) => {
       totalPages: Math.ceil(Number(count) / limit),
     },
   };
-});
+};
 
 // Helper for specific aggregation not covered by general find
-export const getAllFolders = cache(async () => {
+export const getAllFolders = async () => {
   const result = await db
     .selectDistinct({ folder: images.folder })
     .from(images)
     .orderBy(asc(images.folder));
   return result.map((r) => r.folder);
-});
+};
 
-export const getAllCategories = cache(async (folder?: string) => {
+export const getAllCategories = async (folder?: string) => {
   const conditions = [
     folder ? eq(images.folder, folder) : undefined,
     sql`${images.category} IS NOT NULL`,
@@ -114,7 +114,7 @@ export const getAllCategories = cache(async (folder?: string) => {
     .orderBy(asc(images.category));
 
   return result.map((r) => r.category).filter(Boolean) as string[];
-});
+};
 
 export const createImage = async (data: CreateImage) => {
   const [newImage] = await db.insert(images).values(data).returning();

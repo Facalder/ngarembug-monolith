@@ -50,7 +50,13 @@ export const mutationFetcher = async (
   });
 
   if (!res.ok) {
-    throw new Error("Terjadi kesalahan saat memproses permintaan.");
+    const errorData = await res.json().catch(() => ({}));
+    const errorMessage =
+      errorData.error ||
+      (errorData.details
+        ? JSON.stringify(errorData.details)
+        : "Terjadi kesalahan saat memproses permintaan.");
+    throw new Error(errorMessage);
   }
 
   return res.json();
@@ -88,7 +94,4 @@ export const swrConfig: SWRConfiguration = {
   shouldRetryOnError: false,
   dedupingInterval: 60000,
   keepPreviousData: true,
-  fallback: {
-    // Prevent hydration mismatch for basic states if needed
-  },
 };

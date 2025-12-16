@@ -1,12 +1,14 @@
 "use client";
 
+import * as React from "react";
+
 import DashboardTitle from "@/components/dashboard-title";
 import { DataTable } from "@/components/table";
 import { termsColumns } from "@/components/table-columns/terms-table-columns";
 
 export default function TermsPage() {
   return (
-    <>
+    <React.Suspense fallback={null}>
       <DashboardTitle
         title="Syarat dan Ketentuan"
         subtitle="Kelola data syarat dan ketentuan"
@@ -21,6 +23,6 @@ export default function TermsPage() {
         editHref="/dashboard/terms"
         canDelete
       />
-    </>
+    </React.Suspense>
   );
 }

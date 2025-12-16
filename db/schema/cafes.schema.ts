@@ -1,6 +1,7 @@
 import {
   index,
   integer,
+  jsonb,
   numeric,
   pgTable,
   smallint,
@@ -55,6 +56,9 @@ const cafesTable = pgTable.withRLS(
       .default(0)
       .notNull(),
     totalReviews: integer("total_reviews").default(0).notNull(),
+
+    facilities: jsonb("facilities").notNull().default([]),
+    terms: jsonb("terms").notNull().default([]),
 
     contentStatus: contentStatus("content_status")
       .notNull()

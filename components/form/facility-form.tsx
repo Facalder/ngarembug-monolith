@@ -42,7 +42,9 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
   >(null);
 
   // Dynamic SWR key based on create vs edit mode
-  const FACILITIES_ENDPOINT = "/facilities";
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL || "";
+  const API_PATH = BASE_URL.includes("api/v1") ? "" : "/api/v1";
+  const FACILITIES_ENDPOINT = `${BASE_URL}${API_PATH}/facilities`;
   const key = initialData?.id
     ? `${FACILITIES_ENDPOINT}/${initialData.id}`
     : FACILITIES_ENDPOINT;
@@ -89,8 +91,8 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
         },
       );
 
-      router.refresh();
       router.push("/dashboard/facilities");
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error("Gagal memproses permintaan", {

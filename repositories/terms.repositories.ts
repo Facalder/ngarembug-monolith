@@ -11,12 +11,12 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
-import { cache } from "react";
+
 import { db } from "@/db";
 import { terms } from "@/db/schema/terms.schema";
 import type { TermQuery } from "@/schemas/terms.dto";
 
-export const findTerms = cache(async (params: TermQuery) => {
+export const findTerms = async (params: TermQuery) => {
   const {
     id,
     slug,
@@ -67,7 +67,7 @@ export const findTerms = cache(async (params: TermQuery) => {
       totalPages: Math.ceil(Number(count) / limit),
     },
   };
-});
+};
 
 export const createTerm = async (data: typeof terms.$inferInsert) => {
   const [newTerm] = await db.insert(terms).values(data).returning();

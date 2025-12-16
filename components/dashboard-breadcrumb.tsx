@@ -58,10 +58,14 @@ export default function DashboardBreadcrumbs() {
                   <BreadcrumbSeparator>/</BreadcrumbSeparator>
                   <BreadcrumbItem>
                     {isLast ? (
-                      <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                      <BreadcrumbPage>
+                        <span suppressHydrationWarning>{item.label}</span>
+                      </BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink asChild>
-                        <Link href={item.href}>{item.label}</Link>
+                        <Link href={item.href}>
+                          <span suppressHydrationWarning>{item.label}</span>
+                        </Link>
                       </BreadcrumbLink>
                     )}
                   </BreadcrumbItem>
