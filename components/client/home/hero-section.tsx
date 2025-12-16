@@ -1,24 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { LocationFilter } from "@/components/client/search/location-filter"
-import { CafeTypeFilter } from "@/components/client/search/cafe-type-filter"
-import { FacilitiesFilter } from "@/components/client/search/facilities-filter"
-import { GuestFilter } from "@/components/client/search/guest-filter"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Search01FreeIcons } from "@hugeicons/core-free-icons"
-
-import Image from "next/image"
+import { Search01FreeIcons } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import Image from "next/image";
+import { useState } from "react";
+import { CafeTypeFilter } from "@/components/client/search/cafe-type-filter";
+import { FacilitiesFilter } from "@/components/client/search/facilities-filter";
+import { GuestFilter } from "@/components/client/search/guest-filter";
+import { LocationFilter } from "@/components/client/search/location-filter";
+import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
-  const [selectedLocation, setSelectedLocation] = useState("")
-  const [selectedType, setSelectedType] = useState("")
-  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([])
-  const [guestCount, setGuestCount] = useState(1)
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
+  const [guestCount, setGuestCount] = useState(1);
 
   return (
-    <section className="relative min-h-[60vh] flex items-center justify-center ">
+    <section className="relative min-h-[64vh] my-4 flex items-center justify-center ">
       {/* Background Image */}
       <div className="absolute inset-0 z-0 rounded-md">
         <Image
@@ -39,11 +38,17 @@ export function HeroSection() {
 
         {/* Filter Bar */}
         <div className="flex flex-wrap md:flex-nowrap items-center gap-3 justify-center w-full">
-          <LocationFilter value={selectedLocation} onChange={setSelectedLocation} />
+          <LocationFilter
+            value={selectedLocation}
+            onChange={setSelectedLocation}
+          />
 
           <CafeTypeFilter value={selectedType} onChange={setSelectedType} />
 
-          <FacilitiesFilter value={selectedFacilities} onChange={setSelectedFacilities} />
+          <FacilitiesFilter
+            value={selectedFacilities}
+            onChange={setSelectedFacilities}
+          />
 
           <GuestFilter count={guestCount} onChange={setGuestCount} />
 
@@ -56,5 +61,5 @@ export function HeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

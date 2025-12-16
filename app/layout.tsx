@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Geist_Mono, Inter } from "next/font/google";
 import "@/app/styles/globals.css";
-import { Container } from "@/components/container-layout";
+
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -33,11 +33,8 @@ export default function RootLayout({
       <body
         className={`${interSans.variable} ${geistMono.variable} ${bricolageSans.variable} font-sans antialiased`}
       >
-        <main className="min-h-screen">
-          <Container size="xl">
-            {children}
-          </Container>
-        </main>
+
+        {children}
       </body>
     </html>
   );

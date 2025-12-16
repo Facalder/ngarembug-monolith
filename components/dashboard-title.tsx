@@ -42,14 +42,14 @@ export default function DashboardLayout(data: DashboardTitleProps) {
           {customAction}
 
           {createHref ? (
-            <Button asChild size="sm" className="gap-2">
+            <Button asChild size="lg" className="gap-2">
               <Link href={createHref}>
                 <HugeiconsIcon icon={Add01FreeIcons} className="size-4" />
                 {createLabel}
               </Link>
             </Button>
           ) : onCreateClick ? (
-            <Button onClick={onCreateClick} size="sm" className="gap-2">
+            <Button onClick={onCreateClick} size="lg" className="gap-2">
               <HugeiconsIcon icon={Add01FreeIcons} className="size-4" />
               {createLabel}
             </Button>

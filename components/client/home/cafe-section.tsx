@@ -32,7 +32,7 @@ export function CafeSection({
     location = "Batununggal",
 }: CafeSectionProps) {
     return (
-        <section className="py-12 space-y-8 mx-auto">
+        <section className="my-10 space-y-8 mx-auto">
             <div className="space-y-2">
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground">
                     {title || `What's on trending di ${location}?`}

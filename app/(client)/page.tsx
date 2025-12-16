@@ -26,7 +26,7 @@ export default async function Home() {
     return {
       id: cafe.id,
       name: cafe.name,
-      image: image!,
+      image: image || "",
       rating: Number(cafe.averageRating) || 0,
       reviewCount: cafe.totalReviews || 0,
       area: cafe.region, // Can be enhanced with mapping if needed
@@ -45,6 +45,11 @@ export default async function Home() {
   return (
     <>
       <HeroSection />
+      <CafeSection
+        title="Disukai banget ini sama mahasiswa"
+        cafes={mappedCafes}
+      />
+
       <CafeSection
         title="Disukai banget ini sama mahasiswa"
         cafes={mappedCafes}
