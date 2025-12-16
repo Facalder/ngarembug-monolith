@@ -105,7 +105,7 @@ export function CafeDetailHeader({
                 </div>
 
                 {/* Image Grid Section */}
-                {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[400px] md:h-[450px] overflow-hidden rounded-md">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[400px] md:h-[450px] overflow-hidden rounded-md">
                     <div className="md:col-span-3 h-full relative group cursor-pointer bg-muted">
                         <Image
                             src={mainImage}
@@ -151,7 +151,7 @@ export function CafeDetailHeader({
                             </div>
                         </div>
                     </div>
-                </div> */}
+                </div>
             </div>
         </div>
     );
