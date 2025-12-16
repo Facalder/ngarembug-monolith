@@ -1,10 +1,9 @@
-"use client";
 
 import { MenuCircleIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import type * as React from "react";
-import { sidebarData, user } from "@/components/data/sidebar.data";
+import { sidebarData } from "@/components/data/sidebar.data";
 import SidebarNavGroups from "@/components/sidebar-nav-groups";
 import SidebarNavUser from "@/components/sidebar-nav-user";
 
@@ -18,8 +17,11 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { getSession } from "@/lib/auth-utils";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = await getSession();
+
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]! bg-background!"
@@ -55,7 +57,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       {/* USER SECTION */}
       <SidebarFooter>
-        <SidebarNavUser user={user} />
+        <SidebarNavUser user={{
+          name: user?.user.name || "",
+          email: user?.user.email || "",
+          avatar: ""
+        }} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

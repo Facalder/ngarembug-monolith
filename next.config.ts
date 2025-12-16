@@ -28,6 +28,14 @@ const nextConfig: NextConfig = {
       allowedOrigins: ["localhost:3000"],
     },
   },
+  serverExternalPackages: [
+    "prettier",
+    "vscode-oniguruma",
+    "shiki",
+    "@react-email/components",
+    "@react-email/render",
+    "@react-email/tailwind",
+  ],
 };
 
 export default nextConfig;

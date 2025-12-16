@@ -1,8 +1,7 @@
 import type { SWRConfiguration } from "swr";
+import { authClient } from "@/lib/auth-client";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL || "";
-const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN || "";
-
 const buildUrl = (path: string) => {
   if (path.startsWith("http")) return path;
 
@@ -19,10 +18,11 @@ const buildUrl = (path: string) => {
 
 export const fetcher = async (url: string) => {
   const fullUrl = buildUrl(url);
+  const session = await authClient.getSession();
 
   const res = await fetch(fullUrl, {
     headers: {
-      Authorization: `Bearer ${API_TOKEN}`,
+      Authorization: `Bearer ${session.data?.session.token}`,
       "Content-Type": "application/json",
     },
   });
@@ -39,11 +39,12 @@ export const mutationFetcher = async (
   { arg }: { arg: { method: string; body?: Record<string, unknown> } },
 ) => {
   const fullUrl = buildUrl(url);
+  const session = await authClient.getSession();
 
   const res = await fetch(fullUrl, {
     method: arg.method,
     headers: {
-      Authorization: `Bearer ${API_TOKEN}`,
+      Authorization: `Bearer ${session.data?.session.token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(arg.body),
@@ -67,11 +68,12 @@ export const uploadFetcher = async (
   { arg }: { arg: { method: string; body: FormData } },
 ) => {
   const fullUrl = buildUrl(url);
+  const session = await authClient.getSession();
 
   const res = await fetch(fullUrl, {
     method: arg.method,
     headers: {
-      Authorization: `Bearer ${API_TOKEN}`,
+      Authorization: `Bearer ${session.data?.session.token}`,
       // Content-Type is irrelevant for FormData as the browser sets it automatically with boundary
     },
     body: arg.body,

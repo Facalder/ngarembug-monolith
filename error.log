@@ -1,0 +1,11 @@
+
+> ngarembug-monolith@0.1.0 db-generate D:\2025\MY_FILE\TELKOM\NAJEL\V02\ngarembug-monolith
+> npx drizzle-kit generate "--name" "fix_id_auth_schema"
+
+npm warn Unknown env config "npm-globalconfig". This will stop working in the next major version of npm.
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm.
+npm warn Unknown env config "_jsr-registry". This will stop working in the next major version of npm.
+No config path provided, using default 'drizzle.config.ts'
+Reading config file 'D:\2025\MY_FILE\TELKOM\NAJEL\V02\ngarembug-monolith\drizzle.config.ts'
+
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.

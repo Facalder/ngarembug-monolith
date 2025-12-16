@@ -1,6 +1,31 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  // Dashboard protection
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
+    try {
+      const sessionRes = await fetch(
+        `${request.nextUrl.origin}/api/auth/get-session`,
+        {
+          headers: {
+            cookie: request.headers.get("cookie") || "",
+          },
+        },
+      );
+
+      const session = await sessionRes.json();
+
+      if (!session?.user || session.user.role !== "admin") {
+        return NextResponse.redirect(new URL("/login", request.url));
+      }
+
+      return NextResponse.next();
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
+
   const baseApiUrl = process.env.BASE_API_URL;
 
   if (!baseApiUrl) {
@@ -10,7 +35,7 @@ export function proxy(request: NextRequest) {
 
   const requestUrl = request.nextUrl.href;
 
-  // hanya intercept request ke BASE_API_URL
+  // API Token protection (existing logic)
   if (!requestUrl.startsWith(baseApiUrl)) {
     return NextResponse.next();
   }
@@ -39,5 +64,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/:path*"],
+  matcher: ["/api/:path*", "/dashboard/:path*"],
 };

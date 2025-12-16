@@ -7,6 +7,8 @@ if (!connectionString || connectionString.length === 0) {
   throw new Error("DB connection string is empty");
 }
 
+import * as schema from "./schema";
+
 export const client = postgres(connectionString, {
   prepare: false,
   idle_timeout: 30, // Connection idle timeout (30 seconds)
@@ -14,4 +16,6 @@ export const client = postgres(connectionString, {
   connect_timeout: 15, // Connection establishment timeout (15 seconds)
 });
 
-export const db = drizzle({ client });
+export const db = drizzle({ client, schema });
+
+export * from "./schema";

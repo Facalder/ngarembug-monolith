@@ -3,7 +3,7 @@ import type React from "react";
 type User = {
   name: string;
   email: string;
-  avatar: string;
+  avatar?: string;
 };
 
 type NavItem = {

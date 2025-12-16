@@ -30,6 +30,13 @@ import {
 export default function SidebarNavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
 
+  const getInitial = (name: string): string => {
+    return name
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase())
+      .join("");
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -41,7 +48,7 @@ export default function SidebarNavUser({ user }: { user: User }) {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">NJ</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{getInitial(user.name)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -63,7 +70,7 @@ export default function SidebarNavUser({ user }: { user: User }) {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">NJ</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{getInitial(user.name)}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>

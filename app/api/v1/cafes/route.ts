@@ -34,12 +34,22 @@ export async function GET(request: NextRequest) {
   }
 }
 
+import { headers } from "next/headers";
 import type { ZodError } from "zod";
+import { auth } from "@/lib/auth";
 import { createCafe } from "@/repositories/cafes.repositories";
 import { createCafeSchema } from "../../../../schemas/cafes.dto";
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const parsedData = createCafeSchema.parse(body);
 

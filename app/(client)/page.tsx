@@ -1,3 +1,4 @@
+
 import { CafeSection } from "@/components/client/home/cafe-section";
 import { HeroSection } from "@/components/client/home/hero-section";
 import { findCafes } from "@/repositories/cafes.repositories";

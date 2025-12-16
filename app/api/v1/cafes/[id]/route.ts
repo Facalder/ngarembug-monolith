@@ -35,11 +35,22 @@ export async function GET(
   }
 }
 
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const id = (await params).id;
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
@@ -78,6 +89,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const id = (await params).id;
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
