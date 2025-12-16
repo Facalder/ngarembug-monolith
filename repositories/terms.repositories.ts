@@ -6,16 +6,17 @@ import {
   desc,
   eq,
   ilike,
+  inArray,
   or,
   type SQL,
   sql,
 } from "drizzle-orm";
-import { cache } from "react";
+
 import { db } from "@/db";
 import { terms } from "@/db/schema/terms.schema";
 import type { TermQuery } from "@/schemas/terms.dto";
 
-export const findTerms = cache(async (params: TermQuery) => {
+export const findTerms = async (params: TermQuery) => {
   const {
     id,
     slug,
@@ -24,15 +25,18 @@ export const findTerms = cache(async (params: TermQuery) => {
     orderDir = "desc",
     page = 1,
     limit = 10,
+    contentStatus,
   } = params;
 
   const conditions = [
     id && eq(terms.id, id),
     slug && eq(terms.slug, slug),
-    keyword && or(
-      ilike(terms.name, `%${keyword}%`),
-      ilike(terms.description, `%${keyword}%`)
-    ),
+    keyword &&
+      or(
+        ilike(terms.name, `%${keyword}%`),
+        ilike(terms.description, `%${keyword}%`),
+      ),
+    contentStatus?.length && inArray(terms.contentStatus, contentStatus),
   ].filter(Boolean) as SQL[];
 
   const orderCol = {
@@ -63,14 +67,17 @@ export const findTerms = cache(async (params: TermQuery) => {
       totalPages: Math.ceil(Number(count) / limit),
     },
   };
-});
+};
 
 export const createTerm = async (data: typeof terms.$inferInsert) => {
   const [newTerm] = await db.insert(terms).values(data).returning();
   return newTerm;
 };
 
-export const updateTerm = async (id: string, data: Partial<typeof terms.$inferInsert>) => {
+export const updateTerm = async (
+  id: string,
+  data: Partial<typeof terms.$inferInsert>,
+) => {
   const [updatedTerm] = await db
     .update(terms)
     .set(data)

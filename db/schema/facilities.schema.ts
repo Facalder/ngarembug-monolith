@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { contentStatus } from "@/db/schema/enums.schema";
 import { createId } from "@/lib/cuid";
 
 const facilitiesTable = pgTable.withRLS("facilities", {
@@ -9,6 +10,8 @@ const facilitiesTable = pgTable.withRLS("facilities", {
   name: varchar("name", { length: 60 }).notNull().unique(),
   slug: varchar("slug", { length: 80 }).notNull().unique(),
   description: text("description"),
+
+  contentStatus: contentStatus("content_status").notNull().default("PUBLISHED"),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")

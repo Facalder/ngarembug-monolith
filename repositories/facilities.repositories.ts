@@ -6,16 +6,17 @@ import {
   desc,
   eq,
   ilike,
+  inArray,
   or,
   type SQL,
   sql,
 } from "drizzle-orm";
-import { cache } from "react";
+
 import { db } from "@/db";
 import { facilities } from "@/db/schema/facilities.schema";
 import type { FacilityQuery } from "@/schemas/facilities.dto";
 
-export const findFacilities = cache(async (params: FacilityQuery) => {
+export const findFacilities = async (params: FacilityQuery) => {
   const {
     id,
     slug,
@@ -24,15 +25,18 @@ export const findFacilities = cache(async (params: FacilityQuery) => {
     orderDir = "desc",
     page = 1,
     limit = 10,
+    contentStatus,
   } = params;
 
   const conditions = [
     id && eq(facilities.id, id),
     slug && eq(facilities.slug, slug),
-    keyword && or(
-      ilike(facilities.name, `%${keyword}%`),
-      ilike(facilities.description, `%${keyword}%`)
-    ),
+    keyword &&
+      or(
+        ilike(facilities.name, `%${keyword}%`),
+        ilike(facilities.description, `%${keyword}%`),
+      ),
+    contentStatus?.length && inArray(facilities.contentStatus, contentStatus),
   ].filter(Boolean) as SQL[];
 
   const orderCol = {
@@ -63,14 +67,17 @@ export const findFacilities = cache(async (params: FacilityQuery) => {
       totalPages: Math.ceil(Number(count) / limit),
     },
   };
-});
+};
 
 export const createFacility = async (data: typeof facilities.$inferInsert) => {
   const [newFacility] = await db.insert(facilities).values(data).returning();
   return newFacility;
 };
 
-export const updateFacility = async (id: string, data: Partial<typeof facilities.$inferInsert>) => {
+export const updateFacility = async (
+  id: string,
+  data: Partial<typeof facilities.$inferInsert>,
+) => {
   const [updatedFacility] = await db
     .update(facilities)
     .set(data)

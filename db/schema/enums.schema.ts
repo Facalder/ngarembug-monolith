@@ -19,6 +19,7 @@ export const region = pgEnum("Region", [
   "BUAH BATU",
   "DAYEUH_KOLOT",
   "CIGANITRI",
+  "BOJONGSOANG",
 ]);
 export const reviewStatus = pgEnum("ReviewStatus", [
   "APPROVED",

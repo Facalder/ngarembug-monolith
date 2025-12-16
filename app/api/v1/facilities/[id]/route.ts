@@ -12,7 +12,12 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const result = await findFacilities({ id, page: 1, limit: 1 });
+    const result = await findFacilities({
+      id,
+      page: 1,
+      limit: 1,
+      contentStatus: undefined,
+    });
     const facility = result.data[0];
 
     if (!facility) {
