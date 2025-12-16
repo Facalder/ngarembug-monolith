@@ -18,6 +18,7 @@ interface CafeCardProps {
     priceRange: string;
     capacity: string;
     facilities: string[];
+    orientation?: "vertical" | "horizontal";
 }
 
 const CafeCardComponent = ({
@@ -33,24 +34,27 @@ const CafeCardComponent = ({
     priceRange,
     capacity,
     facilities,
+    orientation = "vertical",
 }: CafeCardProps) => {
+    const isHorizontal = orientation === "horizontal";
+
     return (
-        <Link href={href} className="block group">
-            <Card className="ring-0 p-0 gap-0 bg-transparent outline-none shadow-none rounded-none">
+        <Link href={href} className="block group w-full">
+            <Card className={`ring-0 p-0 gap-0 bg-transparent outline-none shadow-none rounded-none w-full ${isHorizontal ? "flex gap-6" : ""}`}>
                 {/* Image Section */}
-                <div className="relative aspect-4/3 w-full overflow-hidden rounded-md mb-3">
+                <div className={`relative overflow-hidden rounded-md ${isHorizontal ? "w-[240px] shrink-0 h-[200px]" : "aspect-4/3 w-full mb-3"}`}>
                     <Image
                         src={image}
                         alt={name}
                         fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        sizes={isHorizontal ? "240px" : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                         priority={false}
                     />
                 </div>
 
                 {/* Content Section */}
-                <div className="flex flex-col gap-2">
+                <div className={`flex flex-col gap-2 ${isHorizontal ? "flex-1 py-1" : ""}`}>
                     {/* Rating & Status */}
                     <div className="flex items-center gap-2 mb-0.5">
                         <span className="flex items-center justify-center bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-[4px]">
@@ -98,20 +102,23 @@ const CafeCardComponent = ({
 
                     {/* Facilities */}
                     {facilities.length > 0 && (
-                        <div className="flex items-center flex-wrap gap-2">
-                            {facilities.slice(0, 3).map((facility, index) => (
+                        <div className="flex flex-wrap gap-2 mt-auto">
+                            {facilities.slice(0, 3).map((facility) => (
                                 <Badge
-                                    key={index.toString()}
+                                    key={facility}
                                     variant="secondary"
-                                    className="px-2 py-3"
+                                    className="bg-muted text-muted-foreground font-normal rounded-md px-2 py-0.5 text-xs pointer-events-none"
                                 >
                                     {facility}
                                 </Badge>
                             ))}
                             {facilities.length > 3 && (
-                                <span className="text-xs text-muted-foreground">
-                                    +{facilities.length - 3} more
-                                </span>
+                                <Badge
+                                    variant="secondary"
+                                    className="bg-muted text-muted-foreground font-normal rounded-md px-2 py-0.5 text-xs pointer-events-none"
+                                >
+                                    +{facilities.length - 3}
+                                </Badge>
                             )}
                         </div>
                     )}
@@ -120,6 +127,7 @@ const CafeCardComponent = ({
         </Link>
     );
 };
+
 
 export const CafeCard = memo(CafeCardComponent);
 
