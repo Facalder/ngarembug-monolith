@@ -1,6 +1,6 @@
 import z from "zod";
 import { CONTENT_STATUS_OPTIONS } from "@/globals/data-options";
-import { createAliasSchema } from "./cafes.dto";
+import { createAliasSchema } from "./utils";
 export const facilitySchema = z.object({
   name: z
     .string()
@@ -36,7 +36,9 @@ export const facilityQuerySchema = z.object({
     .default(10),
 
   contentStatus: createAliasSchema<ContentStatus>(
-    CONTENT_STATUS_OPTIONS.map((opt) => opt.value) as unknown as ContentStatus[],
+    CONTENT_STATUS_OPTIONS.map(
+      (opt) => opt.value,
+    ) as unknown as ContentStatus[],
     STATUS_ALIAS,
   ),
 });

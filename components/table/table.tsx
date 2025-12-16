@@ -159,12 +159,27 @@ export function DataTable<T extends { id: string | number }>({
   const { searchParams, setSort } = useTableState();
 
   // Construct URL with params for SWR key
-  // We use useTableState's params but we need to convert them to string for key
-  const queryString = searchParams.toString();
-  const endpoint = apiEndpoint.startsWith("/")
-    ? apiEndpoint
-    : `/${apiEndpoint}`;
-  const swrKey = `${endpoint}${queryString ? `?${queryString}` : ""}`;
+  const swrKey = React.useMemo(() => {
+    // Explicitly pick only relevant keys to avoid unstable references or noise
+    const params = new URLSearchParams();
+    const page = searchParams.get("page") || "1";
+    const limit = searchParams.get("limit") || "10";
+    const search = searchParams.get("search") || "";
+    const orderBy = searchParams.get("orderBy") || "";
+    const orderDir = searchParams.get("orderDir") || "";
+
+    if (page) params.set("page", page);
+    if (limit) params.set("limit", limit);
+    if (search) params.set("search", search);
+    if (orderBy) params.set("orderBy", orderBy);
+    if (orderDir) params.set("orderDir", orderDir);
+
+    const queryString = params.toString();
+    const endpoint = apiEndpoint.startsWith("/")
+      ? apiEndpoint
+      : `/${apiEndpoint}`;
+    return `${endpoint}${queryString ? `?${queryString}` : ""}`;
+  }, [searchParams, apiEndpoint]);
 
   const { data, error, isLoading, mutate, isValidating } = useSWR(
     swrKey,
@@ -354,40 +369,42 @@ export function DataTable<T extends { id: string | number }>({
                     </Empty>
                   </td>
                 </tr>
-              ) : (rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                >
-                  {columns.map((col) => (
-                    <td
-                      key={String(col.key)}
-                      className={cn(
-                        "p-4 align-middle [&:has([role=checkbox])]:pr-0",
-                        col.className,
-                        getStickyClass(col),
+              ) : (
+                rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                  >
+                    {columns.map((col) => (
+                      <td
+                        key={String(col.key)}
+                        className={cn(
+                          "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+                          col.className,
+                          getStickyClass(col),
+                        )}
+                        style={getStickyStyle(col)}
+                      >
+                        {col.render
+                          ? col.render(row)
+                          : (row[col.key as keyof T] as React.ReactNode)}
+                      </td>
+                    ))}
+                    <td className="p-4 align-middle sticky right-0 z-10 bg-background border-l shadow-[-1px_0_0_0_var(--color-border)]">
+                      {renderRowAction ? (
+                        renderRowAction(row)
+                      ) : (
+                        <RowActions
+                          id={row.id}
+                          apiEndpoint={apiEndpoint}
+                          editHref={editHref}
+                          canDelete={canDelete}
+                        />
                       )}
-                      style={getStickyStyle(col)}
-                    >
-                      {col.render
-                        ? col.render(row)
-                        : (row[col.key as keyof T] as React.ReactNode)}
                     </td>
-                  ))}
-                  <td className="p-4 align-middle sticky right-0 z-10 bg-background border-l shadow-[-1px_0_0_0_var(--color-border)]">
-                    {renderRowAction ? (
-                      renderRowAction(row)
-                    ) : (
-                      <RowActions
-                        id={row.id}
-                        apiEndpoint={apiEndpoint}
-                        editHref={editHref}
-                        canDelete={canDelete}
-                      />
-                    )}
-                  </td>
-                </tr>
-              )))}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

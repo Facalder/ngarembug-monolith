@@ -16,7 +16,8 @@ import {
 import { cache } from "react";
 import { db } from "@/db";
 import { cafes } from "@/db/schema/cafes.schema";
-import type { CafeQuery } from "@/schemas/cafes.dto";
+import { cafeFacilities, cafeTerms } from "@/db/schema/junction-table.schema";
+import type { CafeQuery, CreateCafe, UpdateCafe } from "@/schemas/cafes.dto";
 
 export const findCafes = cache(async (params: CafeQuery) => {
   const {
@@ -110,3 +111,109 @@ export const findCafes = cache(async (params: CafeQuery) => {
     },
   };
 });
+
+export const getCafeById = cache(async (id: string) => {
+  const [cafe] = await db.select().from(cafes).where(eq(cafes.id, id));
+
+  if (!cafe) return null;
+
+  const [facilitiesResult, termsResult] = await Promise.all([
+    db
+      .select({ id: cafeFacilities.facilityId })
+      .from(cafeFacilities)
+      .where(eq(cafeFacilities.cafeId, id)),
+    db
+      .select({ id: cafeTerms.termId })
+      .from(cafeTerms)
+      .where(eq(cafeTerms.cafeId, id)),
+  ]);
+
+  return {
+    ...cafe,
+    facilities: facilitiesResult.map((f) => f.id),
+    terms: termsResult.map((t) => t.id),
+  };
+});
+
+export const createCafe = async (data: CreateCafe) => {
+  const { facilities, terms, ...cafeData } = data;
+
+  return await db.transaction(async (tx) => {
+    // 1. Create Cafe
+    const [newCafe] = await tx
+      .insert(cafes)
+      .values(cafeData as any)
+      .returning();
+
+    // 2. Insert Facilities if any
+    if (facilities?.length) {
+      await tx.insert(cafeFacilities).values(
+        facilities.map((facilityId) => ({
+          cafeId: newCafe.id,
+          facilityId,
+        })),
+      );
+    }
+
+    // 3. Insert Terms if any
+    if (terms?.length) {
+      await tx.insert(cafeTerms).values(
+        terms.map((termId) => ({
+          cafeId: newCafe.id,
+          termId,
+        })),
+      );
+    }
+
+    return newCafe;
+  });
+};
+
+export const updateCafe = async (id: string, data: UpdateCafe) => {
+  const { id: _, facilities, terms, ...updateData } = data;
+
+  return await db.transaction(async (tx) => {
+    // 1. Update Cafe Details
+    const [updatedCafe] = await tx
+      .update(cafes)
+      .set(updateData as any)
+      .where(eq(cafes.id, id))
+      .returning();
+
+    // 2. Update Facilities (Delete all & Re-insert)
+    if (facilities !== undefined) {
+      await tx.delete(cafeFacilities).where(eq(cafeFacilities.cafeId, id));
+      if (facilities.length > 0) {
+        await tx.insert(cafeFacilities).values(
+          facilities.map((facilityId) => ({
+            cafeId: id,
+            facilityId,
+          })),
+        );
+      }
+    }
+
+    // 3. Update Terms (Delete all & Re-insert)
+    if (terms !== undefined) {
+      await tx.delete(cafeTerms).where(eq(cafeTerms.cafeId, id));
+      if (terms.length > 0) {
+        await tx.insert(cafeTerms).values(
+          terms.map((termId) => ({
+            cafeId: id,
+            termId,
+          })),
+        );
+      }
+    }
+
+    return updatedCafe;
+  });
+};
+
+export const deleteCafe = async (id: string) => {
+  const [deletedCafe] = await db
+    .delete(cafes)
+    .where(eq(cafes.id, id))
+    .returning();
+  return deletedCafe;
+};

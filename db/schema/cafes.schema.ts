@@ -8,7 +8,12 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { cafeType, contentStatus, priceRange, region } from "@/db/schema/enums.schema";
+import {
+  cafeType,
+  contentStatus,
+  priceRange,
+  region,
+} from "@/db/schema/enums.schema";
 
 import { createId } from "@/lib/cuid";
 
@@ -37,6 +42,11 @@ const cafesTable = pgTable.withRLS(
     priceRange: priceRange("price_range").notNull(),
     pricePerPerson: integer("price_per_person").notNull().default(0),
 
+    // Assets
+    thumbnail: text("thumbnail"),
+    gallery: text("gallery").array(),
+    menu: text("menu").array(),
+
     averageRating: numeric("average_rating", {
       precision: 3,
       scale: 2,
@@ -46,7 +56,9 @@ const cafesTable = pgTable.withRLS(
       .notNull(),
     totalReviews: integer("total_reviews").default(0).notNull(),
 
-    contentStatus: contentStatus("content_status").notNull().default("PUBLISHED"),
+    contentStatus: contentStatus("content_status")
+      .notNull()
+      .default("PUBLISHED"),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")

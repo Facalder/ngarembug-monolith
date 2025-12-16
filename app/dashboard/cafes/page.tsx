@@ -11,7 +11,7 @@ export default function CafePage() {
         title="Halaman Cafe"
         subtitle="Kelola data cafe"
         createLabel="Tambah kafe"
-        createHref="/dashboard/cafes/create"
+        createHref="/dashboard/cafes/new"
       />
 
       <DataTable

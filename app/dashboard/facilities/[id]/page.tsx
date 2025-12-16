@@ -4,38 +4,38 @@ import { FacilityForm } from "@/components/form/facility-form";
 import { findFacilities } from "@/repositories/facilities.repositories";
 
 interface EditFacilityPageProps {
-    params: Promise<{
-        id: string;
-    }>;
+  params: Promise<{
+    id: string;
+  }>;
 }
 
 export default async function EditFacilityPage({
-    params,
+  params,
 }: EditFacilityPageProps) {
-    const { id } = await params;
+  const { id } = await params;
 
-    const { data } = await findFacilities({
-        id,
-        limit: 1,
-        page: 1,
-        contentStatus: ["DRAFT", "PUBLISHED", "ARCHIVED"], // Fetch regardless of status to edit
-    });
+  const { data } = await findFacilities({
+    id,
+    limit: 1,
+    page: 1,
+    contentStatus: ["DRAFT", "PUBLISHED", "ARCHIVED"], // Fetch regardless of status to edit
+  });
 
-    const facility = data[0];
+  const facility = data[0];
 
-    if (!facility) {
-        notFound();
-    }
+  if (!facility) {
+    notFound();
+  }
 
-    return (
-        <>
-            <DashboardTitle title={`${facility.name}`} subtitle="Perbarui data" />
-            <FacilityForm
-                initialData={{
-                    ...facility,
-                    description: facility.description ?? undefined,
-                }}
-            />
-        </>
-    );
+  return (
+    <>
+      <DashboardTitle title={`${facility.name}`} subtitle="Perbarui data" />
+      <FacilityForm
+        initialData={{
+          ...facility,
+          description: facility.description ?? undefined,
+        }}
+      />
+    </>
+  );
 }

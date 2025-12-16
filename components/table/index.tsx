@@ -18,7 +18,8 @@ export const DataTable = dynamic(
 ) => JSX.Element;
 
 export const TableToolbar = dynamic(
-  () => import("@/components/table/table-toolbar").then((mod) => mod.TableToolbar),
+  () =>
+    import("@/components/table/table-toolbar").then((mod) => mod.TableToolbar),
   {
     loading: () => <Skeleton className="h-9 w-full rounded-md" />,
     ssr: false,
@@ -26,7 +27,10 @@ export const TableToolbar = dynamic(
 );
 
 export const TablePagination = dynamic(
-  () => import("@/components/table/table-pagination").then((mod) => mod.TablePagination),
+  () =>
+    import("@/components/table/table-pagination").then(
+      (mod) => mod.TablePagination,
+    ),
   {
     ssr: false,
   },

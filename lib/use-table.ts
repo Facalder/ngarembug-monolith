@@ -105,7 +105,7 @@ export function useTableState(_options: UseTableStateOptions = {}) {
   const setFilter = useCallback(
     (key: string, values: string[] | string | null) => {
       const params = new URLSearchParams(searchParams);
-      
+
       if (!values || (Array.isArray(values) && values.length === 0)) {
         params.delete(key);
       } else if (Array.isArray(values)) {

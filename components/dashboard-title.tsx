@@ -29,9 +29,7 @@ export default function DashboardLayout(data: DashboardTitleProps) {
   return (
     <div className="flex flex-wrap justify-between items-start gap-4 mb-4 md:mb-6 lg:mb-8">
       <div className="flex flex-col gap-1">
-        <h1 className="font-bold  text-2xl md:text-3xl">
-          {title}
-        </h1>
+        <h1 className="font-bold  text-2xl md:text-3xl">{title}</h1>
         {subtitle && (
           <p className="text-muted-foreground text-sm md:text-base">
             {subtitle}

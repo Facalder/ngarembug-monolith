@@ -94,7 +94,7 @@ export const cafeColumns: Column<Cafe>[] = [
     label: "Status",
     sortable: true,
     render: (row) => {
-      const status = (row.contentStatus || "draft").toLowerCase()
+      const status = (row.contentStatus || "draft").toLowerCase();
 
       return (
         <Badge
@@ -107,7 +107,7 @@ export const cafeColumns: Column<Cafe>[] = [
         >
           {status}
         </Badge>
-      )
+      );
     },
-  }
+  },
 ];
