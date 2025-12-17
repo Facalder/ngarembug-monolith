@@ -35,12 +35,12 @@ export function TablePagination({
   if (isLoading) {
     return (
       <div className="flex items-center justify-between">
-        <Skeleton className="h-8 w-[200px]" />
+        <Skeleton className="h-8 w-50" />
         <div className="flex items-center gap-6 lg:gap-8">
           <div className="flex items-center gap-2">
-            <Skeleton className="h-8 w-[100px]" />
+            <Skeleton className="h-8 w-25" />
           </div>
-          <Skeleton className="h-8 w-[150px]" />
+          <Skeleton className="h-8 w-37.5" />
         </div>
       </div>
     );
@@ -60,7 +60,7 @@ export function TablePagination({
               setLimit(Number(value));
             }}
           >
-            <SelectTrigger className="h-8 w-[70px]">
+            <SelectTrigger className="h-8 w-17.5">
               <SelectValue placeholder={limit} />
             </SelectTrigger>
             <SelectContent side="top">
@@ -72,7 +72,7 @@ export function TablePagination({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+        <div className="flex w-25 items-center justify-center text-sm font-medium">
           Page {page} of {totalPages}
         </div>
         <div className="flex items-center gap-2">

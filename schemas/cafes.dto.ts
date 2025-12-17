@@ -71,6 +71,64 @@ export const createCafeSchema = z.object({
     .default([]),
 });
 
+// Schema untuk draft - only require nama
+export const draftCafeSchema = z.object({
+  // Field wajib - hanya nama
+  name: z.string().min(1, "Nama wajib diisi").max(100),
+  
+  // Field opsional lainnya
+  slug: z.string().min(1, "Slug wajib diisi"),
+  description: z.string().optional().default(''),
+
+  // Detail Kafe
+  cafeType: z.enum(cafeType.enumValues).optional().default('INDOOR_CAFE'),
+  capacity: z.coerce.number().min(0).default(0),
+
+  // Lokasi & Kontak
+  region: z.enum(region.enumValues).optional().default('SUKABIRUS'),
+  distance: z.coerce.number().min(0).default(0),
+  address: z.string().optional().default(''),
+  phone: z.string().max(20).optional().nullable().default(''),
+  email: z.string().max(100).optional().nullable().default(''),
+  website: z.string().max(255).optional().nullable().default(''),
+  mapLink: z.string().optional().default(''),
+
+  // Akomodasi
+  priceRange: z.enum(priceRange.enumValues).optional().default('LOW'),
+  pricePerPerson: z.coerce.number().min(0).default(0),
+
+  // Assets
+  thumbnail: z.string().optional().default(''),
+  gallery: z.array(z.string()).optional().default([]),
+  menu: z.array(z.string()).optional().default([]),
+
+  // Status & Relations
+  contentStatus: z.enum(contentStatus.enumValues).default("DRAFT"),
+  facilities: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .default([]),
+  terms: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .default([]),
+});
+
+
+export const publishCafeSchema = createCafeSchema;
+
 export const updateCafeSchema = createCafeSchema.partial().extend({
   id: z.string(),
 });

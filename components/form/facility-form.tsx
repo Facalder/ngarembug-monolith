@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ZodError } from "zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -29,7 +30,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { generateSlug } from "@/lib/slug";
 import { mutationFetcher } from "@/lib/swr";
-import { type Facility, facilitySchema } from "@/schemas/facilities.dto";
+import {
+  type Facility,
+  facilitySchema,
+  draftFacilitySchema,
+  publishFacilitySchema,
+} from "@/schemas/facilities.dto";
+import { BASE_API_URL } from "@/globals/globals";
 
 interface FacilityFormProps {
   initialData?: Facility & { id: string; contentStatus?: string };
@@ -42,9 +49,7 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
   >(null);
 
   // Dynamic SWR key based on create vs edit mode
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL || "";
-  const API_PATH = BASE_URL.includes("api/v1") ? "" : "/api/v1";
-  const FACILITIES_ENDPOINT = `${BASE_URL}${API_PATH}/facilities`;
+  const FACILITIES_ENDPOINT = `/facilities`;
   const key = initialData?.id
     ? `${FACILITIES_ENDPOINT}/${initialData.id}`
     : FACILITIES_ENDPOINT;
@@ -75,7 +80,7 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
 
     try {
       const method = initialData?.id ? "PUT" : "POST";
-      const payload = { ...values, contentStatus: status };
+      const payload = { ...values, contentStatus: status, ...(initialData?.id && { id: initialData.id }) };
 
       await trigger({ method, body: payload });
 
@@ -100,6 +105,51 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
       });
     } finally {
       setSubmitStatus(null);
+    }
+  };
+
+  // Handle submit draft - validate dengan draftFacilitySchema (less strict)
+  const handleSubmitDraft = async () => {
+    try {
+      const values = form.getValues();
+      // Validate dengan draft schema (less strict)
+      const validatedValues = draftFacilitySchema.parse(values);
+      await onSubmit(validatedValues as Facility, "DRAFT");
+
+       router.push("/dashboard/facilities");
+      router.refresh();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const firstError = error.issues[0];
+        toast.error("Validasi gagal", {
+          description: `${firstError.path.join(".")}: ${firstError.message}`,
+        });
+      } else if (error instanceof Error) {
+        toast.error("Validasi gagal", {
+          description: error.message,
+        });
+      }
+    }
+  };
+
+  // Handle submit publish - validate dengan publishFacilitySchema (strict)
+  const handleSubmitPublish = async () => {
+    try {
+      const values = form.getValues();
+      // Validate dengan publish schema (strict)
+      const validatedValues = publishFacilitySchema.parse(values);
+      await onSubmit(validatedValues as Facility, "PUBLISHED");
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const firstError = error.issues[0];
+        toast.error("Validasi gagal", {
+          description: `${firstError.path.join(".")}: ${firstError.message}`,
+        });
+      } else if (error instanceof Error) {
+        toast.error("Validasi gagal", {
+          description: error.message,
+        });
+      }
     }
   };
 
@@ -176,12 +226,8 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
           loadingDraft={isMutating && submitStatus === "DRAFT"}
           loadingPublish={isMutating && submitStatus === "PUBLISHED"}
           onCancel={handleCancel}
-          onSubmitDraft={form.handleSubmit((values) =>
-            onSubmit(values, "DRAFT"),
-          )}
-          onSubmitPublish={form.handleSubmit((values) =>
-            onSubmit(values, "PUBLISHED"),
-          )}
+          onSubmitDraft={handleSubmitDraft}
+          onSubmitPublish={handleSubmitPublish}
         />
       </FormLayout.Actions>
     </FormLayout>

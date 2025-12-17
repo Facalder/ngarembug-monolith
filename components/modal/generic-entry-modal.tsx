@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { mutationFetcher } from "@/lib/swr";
+import { BASE_API_URL } from "@/globals/globals";
 
 const genericSchema = z.object({
   name: z.string().min(1, "Nama wajib diisi").max(100),
@@ -57,15 +58,9 @@ export function GenericEntryModal({
   // Construct the endpoint URL
   const endpoint = React.useMemo(() => {
     if (!config?.endpoint) return "";
-    if (config.endpoint.startsWith("http")) return config.endpoint;
 
-    // If endpoint starts with /, return as is. The swr fetcher handles BASE_URL prepending.
-    if (config.endpoint.startsWith("/")) {
-      return config.endpoint;
-    }
-
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL || "";
-    return `${baseUrl}/${config.endpoint}`;
+    // Prepend /api/v1 for relative endpoints
+    return `${BASE_API_URL}/${config.endpoint}`;
   }, [config?.endpoint]);
 
   const { trigger, isMutating } = useSWRMutation(endpoint, mutationFetcher);
@@ -136,7 +131,7 @@ export function GenericEntryModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Tambah {config.title}</DialogTitle>
           <DialogDescription>

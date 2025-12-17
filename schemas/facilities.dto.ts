@@ -46,6 +46,21 @@ export const facilityQuerySchema = z.object({
 export const createFacilitySchema = facilitySchema;
 export const updateFacilitySchema = facilitySchema.partial();
 
+// Schema untuk draft - only require nama
+export const draftFacilitySchema = z.object({
+  name: z
+    .string()
+    .min(1, "Nama wajib diisi")
+    .max(60, "Nama maksimal 60 karakter"),
+  slug: z
+    .string()
+    .min(1, "Slug wajib diisi")
+    .max(80, "Slug maksimal 80 karakter"),
+  description: z.string().optional(),
+});
+
+export const publishFacilitySchema = facilitySchema;
+
 export type Facility = z.infer<typeof facilitySchema>;
 export type FacilityQuery = z.infer<typeof facilityQuerySchema>;
 export type CreateFacility = z.infer<typeof createFacilitySchema>;

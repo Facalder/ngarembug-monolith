@@ -10,7 +10,7 @@ export * from "@/components/table/table";
 export const DataTable = dynamic(
   () => import("@/components/table/table").then((mod) => mod.DataTable),
   {
-    loading: () => <Skeleton className="h-[400px] w-full rounded-md" />,
+    loading: () => <Skeleton className="h-100 w-full rounded-md" />,
     ssr: false,
   },
 ) as <T extends { id: string | number }>(

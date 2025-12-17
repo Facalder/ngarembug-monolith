@@ -281,7 +281,7 @@ export function DataTable<T extends { id: string | number }>({
                   );
                 })}
                 {/* Actions column */}
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground sticky right-0 z-10 bg-background border-l shadow-[-1px_0_0_0_var(--color-border)] w-[50px]"></th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground sticky right-0 z-10 bg-background border-l shadow-[-1px_0_0_0_var(--color-border)] w-12.5"></th>
               </tr>
             </thead>
             <tbody className="[&_tr:last-child]:border-0">

@@ -7,7 +7,7 @@ export type Cafe = typeof cafes.$inferSelect;
 export const cafeColumns: Column<Cafe>[] = [
   {
     key: "name",
-    label: "Name",
+    label: "Nama",
     sortable: true,
     pinned: "left",
     className: "font-medium",
@@ -19,17 +19,24 @@ export const cafeColumns: Column<Cafe>[] = [
   },
   {
     key: "cafeType",
-    label: "Type",
+    label: "Tipe",
     sortable: true,
-    render: (row) => (
-      <span className="capitalize">
-        {row.cafeType.replace(/_/g, " ").toLowerCase()}
-      </span>
-    ),
+    render: (row) => {
+      const typeLabels: Record<string, string> = {
+        INDOOR_CAFE: "Indoor",
+        OUTDOOR_CAFE: "Outdoor",
+        INDOOR_OUTDOOR_CAFE: "Indoor & Outdoor",
+      };
+      return (
+        <span className="capitalize">
+          {typeLabels[row.cafeType] || row.cafeType.replace(/_/g, " ").toLowerCase()}
+        </span>
+      );
+    },
   },
   {
     key: "region",
-    label: "Region",
+    label: "Wilayah",
     sortable: true,
     render: (row) => (
       <span className="capitalize">{row.region.replace(/-/g, " ")}</span>
@@ -37,16 +44,24 @@ export const cafeColumns: Column<Cafe>[] = [
   },
   {
     key: "address",
-    label: "Address",
+    label: "Alamat",
     className: "max-w-[300px] whitespace-normal",
   },
   {
     key: "priceRange",
-    label: "Price Range",
+    label: "Rentang Harga",
     sortable: true,
-    render: (row) => (
-      <span className="whitespace-nowrap">{row.priceRange}</span>
-    ),
+    render: (row) => {
+      const priceLabels: Record<string, string> = {
+        LOW: "Murah",
+        MEDIUM: "Sedang",
+        HIGH: "Mahal",
+        PREMIUM: "Premium",
+      };
+      return (
+        <span className="whitespace-nowrap">{priceLabels[row.priceRange] || row.priceRange}</span>
+      );
+    },
   },
   {
     key: "averageRating",
@@ -63,7 +78,7 @@ export const cafeColumns: Column<Cafe>[] = [
   },
   {
     key: "createdAt",
-    label: "Created At",
+    label: "Dibuat",
     sortable: true,
     render: (row) => (
       <span>
@@ -77,7 +92,7 @@ export const cafeColumns: Column<Cafe>[] = [
   },
   {
     key: "updatedAt",
-    label: "Updated At",
+    label: "Diperbarui",
     sortable: true,
     render: (row) => (
       <span>
@@ -95,6 +110,11 @@ export const cafeColumns: Column<Cafe>[] = [
     sortable: true,
     render: (row) => {
       const status = (row.contentStatus || "draft").toLowerCase();
+      const statusLabels: Record<string, string> = {
+        draft: "Draft",
+        published: "Dipublikasikan",
+        archived: "Diarsipkan",
+      };
 
       return (
         <Badge
@@ -105,7 +125,7 @@ export const cafeColumns: Column<Cafe>[] = [
               : ""
           }
         >
-          {status}
+          {statusLabels[status] || status}
         </Badge>
       );
     },

@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ZodError } from "zod";
 import { Delete01Icon, ImageAdd01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
@@ -50,7 +51,14 @@ import type { Image as ImageType } from "@/db/schema/images.schema";
 import { generateSlug } from "@/lib/slug";
 import { STORAGE_BUCKETS } from "@/lib/storage-constants";
 import { fetcher, mutationFetcher } from "@/lib/swr";
-import { type CreateCafe, createCafeSchema } from "@/schemas/cafes.dto";
+import {
+  type CreateCafe,
+  createCafeSchema,
+  draftCafeSchema,
+  publishCafeSchema,
+} from "@/schemas/cafes.dto";
+import { BASE_API_URL } from "@/globals/globals";
+import { PRICE_RANGE_OPTIONS } from "@/globals/data-options";
 
 interface CafeFormProps {
   initialData?: CreateCafe & { id: string };
@@ -81,10 +89,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
     null,
   );
 
-  // Dynamic SWR key
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL || "";
-  const API_PATH = BASE_URL.includes("api/v1") ? "" : "/api/v1";
-  const CAFES_ENDPOINT = `${BASE_URL}${API_PATH}/cafes`;
+  const CAFES_ENDPOINT = `/cafes`;
   // Assuming standard API path
   const key = initialData?.id
     ? `${CAFES_ENDPOINT}/${initialData.id}`
@@ -94,7 +99,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
 
   // Use full paths for clarity and to match buildUrl logic accurately
   const { data: facilitiesData, error: facilitiesError } = useSWR(
-    `${BASE_URL}${API_PATH}/facilities?limit=100`,
+    `/facilities?limit=100`,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -104,7 +109,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
   );
 
   const { data: termsData, error: termsError } = useSWR(
-    `${BASE_URL}${API_PATH}/terms?limit=100`,
+    `/terms?limit=100`,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -244,9 +249,9 @@ export function CafeForm({ initialData }: CafeFormProps) {
     setSubmitStatus(status);
     try {
       const method = initialData?.id ? "PUT" : "POST";
-      const payload = { ...values, contentStatus: status };
+      const payload = { ...values, contentStatus: status, ...(initialData?.id && { id: initialData.id }) };
 
-      await trigger({ method, body: payload });
+      const result = await trigger({ method, body: payload });
 
       toast.success(
         status === "PUBLISHED"
@@ -257,8 +262,8 @@ export function CafeForm({ initialData }: CafeFormProps) {
         },
       );
 
-      router.refresh();
       router.push("/dashboard/cafes");
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error("Gagal memproses permintaan", {
@@ -269,6 +274,51 @@ export function CafeForm({ initialData }: CafeFormProps) {
       });
     } finally {
       setSubmitStatus(null);
+    }
+  };
+
+  // Handle submit draft - validate dengan draftCafeSchema (less strict)
+  const handleSubmitDraft = async () => {
+    try {
+      const values = form.getValues();
+      // Validate dengan draft schema (less strict)
+      const validatedValues = draftCafeSchema.parse(values);
+      await onSubmit(validatedValues as CreateCafe, "DRAFT");
+
+       router.push("/dashboard/cafes");
+      router.refresh();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const firstError = error.issues[0];
+        toast.error("Validasi gagal", {
+          description: `${firstError.path.join(".")}: ${firstError.message}`,
+        });
+      } else if (error instanceof Error) {
+        toast.error("Validasi gagal", {
+          description: error.message,
+        });
+      }
+    }
+  };
+
+  // Handle submit publish - validate dengan publishCafeSchema (strict)
+  const handleSubmitPublish = async () => {
+    try {
+      const values = form.getValues();
+      // Validate dengan publish schema (strict)
+      const validatedValues = publishCafeSchema.parse(values);
+      await onSubmit(validatedValues as CreateCafe, "PUBLISHED");
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const firstError = error.issues[0];
+        toast.error("Validasi gagal", {
+          description: `${firstError.path.join(".")}: ${firstError.message}`,
+        });
+      } else if (error instanceof Error) {
+        toast.error("Validasi gagal", {
+          description: error.message,
+        });
+      }
     }
   };
 
@@ -378,11 +428,18 @@ export function CafeForm({ initialData }: CafeFormProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {cafeType.enumValues.map((type) => (
-                              <SelectItem key={type} value={type}>
-                                {type.replace("_", " ").toUpperCase()}
-                              </SelectItem>
-                            ))}
+                            {cafeType.enumValues.map((type) => {
+                              const typeLabels: Record<string, string> = {
+                                INDOOR_CAFE: "Indoor",
+                                OUTDOOR_CAFE: "Outdoor",
+                                INDOOR_OUTDOOR_CAFE: "Indoor & Outdoor",
+                              };
+                              return (
+                                <SelectItem key={type} value={type}>
+                                  {typeLabels[type] || type.replace(/_/g, " ")}
+                                </SelectItem>
+                              );
+                            })}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -502,9 +559,13 @@ export function CafeForm({ initialData }: CafeFormProps) {
                             placeholder="08..."
                             {...field}
                             value={field.value || ""}
+                            onChange={(e) => field.onChange(e.target.value || null)}
                             disabled={isMutating}
                           />
                         </FormControl>
+                        <FormDescription>
+                          Nomor telepon kafe (bisa dikosongkan)
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -520,9 +581,13 @@ export function CafeForm({ initialData }: CafeFormProps) {
                             placeholder="email@example.com"
                             {...field}
                             value={field.value || ""}
+                            onChange={(e) => field.onChange(e.target.value || null)}
                             disabled={isMutating}
                           />
                         </FormControl>
+                        <FormDescription>
+                          Email kafe untuk kontak (bisa dikosongkan)
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -535,15 +600,19 @@ export function CafeForm({ initialData }: CafeFormProps) {
                     name="website"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Website (Opsional)</FormLabel>
+                        <FormLabel>Website / Sosial Media (Opsional)</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="https://..."
                             {...field}
                             value={field.value || ""}
+                            onChange={(e) => field.onChange(e.target.value || null)}
                             disabled={isMutating}
                           />
                         </FormControl>
+                        <FormDescription>
+                          Website resmi atau link sosial media (Instagram, Facebook, TikTok, dll). Format: https://...
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -575,7 +644,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
                 <CardTitle>Akomodasi</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+                <div className="gap-4 items-baseline grid grid-cols-1 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="priceRange"
@@ -593,9 +662,9 @@ export function CafeForm({ initialData }: CafeFormProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {priceRange.enumValues.map((p) => (
-                              <SelectItem key={p} value={p}>
-                                {p}
+                            {PRICE_RANGE_OPTIONS.map((p) => (
+                              <SelectItem key={p.alias} value={p.value}>
+                                {p.label}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -613,10 +682,14 @@ export function CafeForm({ initialData }: CafeFormProps) {
                         <FormControl>
                           <Input
                             type="number"
+                            placeholder="50000"
                             {...field}
                             disabled={isMutating}
                           />
                         </FormControl>
+                        <FormDescription>
+                          Masukkan harga dalam rupiah tanpa format (misal: 50000 untuk Rp50.000)
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -663,7 +736,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
                           onAddClick={() => {
                             setGenericConfig({
                               title: "Fasilitas",
-                              endpoint: `${BASE_URL}${API_PATH}/facilities`,
+                              endpoint: `/facilities`,
                             });
                             setGenericModalOpen(true);
                           }}
@@ -703,7 +776,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
                           onAddClick={() => {
                             setGenericConfig({
                               title: "Ketentuan",
-                              endpoint: `${BASE_URL}${API_PATH}/terms`,
+                              endpoint: `/terms`,
                             });
                             setGenericModalOpen(true);
                           }}
@@ -907,12 +980,8 @@ export function CafeForm({ initialData }: CafeFormProps) {
           loadingDraft={isMutating && submitStatus === "DRAFT"}
           loadingPublish={isMutating && submitStatus === "PUBLISHED"}
           onCancel={() => router.back()}
-          onSubmitDraft={form.handleSubmit((values) =>
-            onSubmit(values, "DRAFT"),
-          )}
-          onSubmitPublish={form.handleSubmit((values) =>
-            onSubmit(values, "PUBLISHED"),
-          )}
+          onSubmitDraft={handleSubmitDraft}
+          onSubmitPublish={handleSubmitPublish}
         />
       </FormLayout.Actions>
 
@@ -934,8 +1003,8 @@ export function CafeForm({ initialData }: CafeFormProps) {
             genericConfig?.endpoint.includes("facilities") ?? false;
 
           const mutateKey = isFacilities
-            ? `${BASE_URL}${API_PATH}/facilities?limit=100`
-            : `${BASE_URL}${API_PATH}/terms?limit=100`;
+            ? `/facilities?limit=100`
+            : `/terms?limit=100`;
 
           const fieldName = isFacilities ? "facilities" : "terms";
 

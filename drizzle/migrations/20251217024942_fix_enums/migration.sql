@@ -1,0 +1,3 @@
+UPDATE cafes SET type = 'INDOOR_OUTDOOR_CAFE' WHERE type = 'INDOOR-OUTDOOR_CAFE';
+UPDATE cafes SET region = 'CIJAGRA' WHERE region = 'CIJAGRA';
+UPDATE cafes SET region = 'BOJONGSOANG' WHERE region = 'BOJONGSOANG';

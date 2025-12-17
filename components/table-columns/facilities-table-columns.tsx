@@ -15,7 +15,7 @@ interface Facility {
 export const facilitiesColumns: Column<Facility>[] = [
   {
     key: "name",
-    label: "Name",
+    label: "Nama",
     sortable: true,
     className: "min-w-[200px] font-medium",
   },
@@ -26,7 +26,7 @@ export const facilitiesColumns: Column<Facility>[] = [
   },
   {
     key: "description",
-    label: "Description",
+    label: "Deskripsi",
     className: "max-w-[300px] whitespace-normal md:max-w-[400px]",
     render: (row) => (
       <span className="block" title={row.description || ""}>
@@ -36,7 +36,7 @@ export const facilitiesColumns: Column<Facility>[] = [
   },
   {
     key: "createdAt",
-    label: "Created At",
+    label: "Dibuat",
     sortable: true,
     render: (row) =>
       new Date(row.createdAt).toLocaleDateString("id-ID", {
@@ -47,7 +47,7 @@ export const facilitiesColumns: Column<Facility>[] = [
   },
   {
     key: "updatedAt",
-    label: "Updated At",
+    label: "Diperbarui",
     render: (row) =>
       new Date(row.updatedAt).toLocaleDateString("id-ID", {
         day: "numeric",
@@ -59,10 +59,18 @@ export const facilitiesColumns: Column<Facility>[] = [
     key: "contentStatus",
     label: "Status",
     sortable: true,
-    render: (row) => (
-      <span className="capitalize">
-        {(row.contentStatus || "draft").toLowerCase()}
-      </span>
-    ),
+    render: (row) => {
+      const status = (row.contentStatus || "draft").toLowerCase();
+      const statusLabels: Record<string, string> = {
+        draft: "Draft",
+        published: "Dipublikasikan",
+        archived: "Diarsipkan",
+      };
+      return (
+        <span className="capitalize">
+          {statusLabels[status] || status}
+        </span>
+      );
+    },
   },
 ];

@@ -1,7 +1,7 @@
 export const CONTENT_STATUS_OPTIONS = [
   { value: "DRAFT", label: "Draft", alias: "dft" },
-  { value: "PUBLISHED", label: "Terpublish", alias: "pub" },
-  { value: "ARCHIVED", label: "Arsip", alias: "arc" },
+  { value: "PUBLISHED", label: "Dipublikasikan", alias: "pub" },
+  { value: "ARCHIVED", label: "Diarsipkan", alias: "arc" },
 ] as const;
 
 export const PRICE_RANGE_OPTIONS = [
@@ -12,8 +12,9 @@ export const PRICE_RANGE_OPTIONS = [
 ] as const;
 
 export const CAFE_TYPE_OPTIONS = [
-  { value: "INDOOR_CAFE", label: "Cafe Indoor", alias: "in" },
-  { value: "OUTDOOR_CAFE", label: "Cafe Outdoor", alias: "out" },
+  { value: "INDOOR_CAFE", label: "Indoor", alias: "in" },
+  { value: "OUTDOOR_CAFE", label: "Outdoor", alias: "out" },
+  { value: "INDOOR_OUTDOOR_CAFE", label: "Indoor & Outdoor", alias: "io" },
 ] as const;
 
 export const REGION_OPTIONS = [
@@ -23,6 +24,7 @@ export const REGION_OPTIONS = [
   { value: "BUAH BATU", label: "Buah Batu", alias: "bbt" },
   { value: "DAYEUH_KOLOT", label: "Dayeuh Kolot", alias: "dyk" },
   { value: "CIGANITRI", label: "Ciganitri", alias: "cgn" },
+  { value: "CIJAGRA", label: "Cijagra", alias: "cjg" },
   { value: "BOJONGSOANG", label: "Bojongsoang", alias: "bjs" },
 ] as const;
 

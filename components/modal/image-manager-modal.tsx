@@ -51,7 +51,7 @@ export function ImageManagerModal({
   selectedImages = EMPTY_ARRAY,
   multiple = true,
   maxSelect,
-  bucket = "VENUE_IMAGES",
+  bucket = "NGAREMBUG_IMAGES",
 }: ImageManagerModalProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [localSelected, setLocalSelected] = useState<Set<string>>(new Set());
@@ -59,11 +59,8 @@ export function ImageManagerModal({
 
   // Normalize bucket name
   const bucketName = useMemo(() => {
-    if (bucket === "VENUE_IMAGES" || bucket === "venue-images") {
-      return "venue-images";
-    }
-    if (bucket === "VENUE_DETAIL_IMAGES" || bucket === "venue-detail-images") {
-      return "venue-detail-images";
+    if (bucket === "NGAREMBUG_IMAGES" || bucket === "ngarembug-images") {
+      return "ngarembug-images";
     }
     return bucket;
   }, [bucket]);
@@ -76,7 +73,7 @@ export function ImageManagerModal({
     isLoading: isFetching,
   } = useSWR(
     open
-      ? `/api/v1/images?bucket=${encodeURIComponent(bucketName)}&limit=50`
+      ? `/images?bucket=${encodeURIComponent(bucketName)}&limit=50`
       : null,
     fetcher,
     swrConfig,
@@ -93,13 +90,13 @@ export function ImageManagerModal({
 
   // SWR Mutation for Upload
   const { trigger: uploadTrigger, isMutating: isUploading } = useSWRMutation(
-    "/api/v1/images",
+    "/images",
     uploadFetcher,
   );
 
   // SWR Mutation for Delete
   const { trigger: deleteTrigger, isMutating: isDeleting } = useSWRMutation(
-    "/api/v1/images",
+    "/images",
     mutationFetcher,
   );
 
@@ -274,14 +271,6 @@ export function ImageManagerModal({
       <DialogContent className="flex flex-col p-0 h-[90vh]">
         <DialogHeader className="relative px-6 pt-6 pb-4 border-b">
           <DialogTitle className="pr-8">Kelola Gambar</DialogTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onOpenChange(false)}
-            className="top-4 right-4 absolute w-8 h-8"
-          >
-            <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" />
-          </Button>
         </DialogHeader>
 
         <Tabs

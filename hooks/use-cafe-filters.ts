@@ -10,12 +10,12 @@ interface SimpleItem {
 
 export function useCafeTableFilters() {
   const { data: facilitiesData, isLoading: isFacilitiesLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_BASE_API_URL}/facilities?limit=100&contentStatus=PUBLISHED`,
+    `/facilities?limit=100&contentStatus=PUBLISHED`,
     fetcher,
   );
 
   const { data: termsData, isLoading: isTermsLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_BASE_API_URL}/terms?limit=100&contentStatus=PUBLISHED`,
+    `/terms?limit=100&contentStatus=PUBLISHED`,
     fetcher,
   );
 
@@ -23,6 +23,7 @@ export function useCafeTableFilters() {
     {
       key: "facilities",
       label: "Fasilitas",
+      description: "Pilih fasilitas yang tersedia di kafe",
       options:
         facilitiesData?.data?.map((f: SimpleItem) => ({
           label: f.name,
@@ -32,6 +33,7 @@ export function useCafeTableFilters() {
     {
       key: "terms",
       label: "Ketentuan",
+      description: "Pilih ketentuan yang berlaku di kafe",
       options:
         termsData?.data?.map((t: SimpleItem) => ({
           label: t.name,

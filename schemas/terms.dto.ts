@@ -46,6 +46,21 @@ export const termQuerySchema = z.object({
 export const createTermSchema = termSchema;
 export const updateTermSchema = termSchema.partial();
 
+// Schema untuk draft - only require nama
+export const draftTermSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Nama wajib diisi")
+    .max(60, "Nama maksimal 60 karakter"),
+  slug: z
+    .string()
+    .min(1, "Slug wajib diisi")
+    .max(80, "Slug maksimal 80 karakter"),
+  description: z.string().optional(),
+});
+
+export const publishTermSchema = termSchema;
+
 export type Term = z.infer<typeof termSchema>;
 export type TermQuery = z.infer<typeof termQuerySchema>;
 export type CreateTerm = z.infer<typeof createTermSchema>;

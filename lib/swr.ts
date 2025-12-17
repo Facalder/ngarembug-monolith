@@ -1,18 +1,11 @@
+import { API_TOKEN, BASE_API_URL } from "@/globals/globals";
 import type { SWRConfiguration } from "swr";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_API_URL || "";
-const API_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN || "";
 
 const buildUrl = (path: string) => {
   if (path.startsWith("http")) return path;
 
-  const cleanBase = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
+  const cleanBase = BASE_API_URL.endsWith("/") ? BASE_API_URL.slice(0, -1) : BASE_API_URL;
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
-
-  // Fix double API prefix issue if BASE_URL already contains the path prefix
-  if (cleanBase.endsWith("/api/v1") && cleanPath.startsWith("/api/v1")) {
-    return `${cleanBase.slice(0, -"/api/v1".length)}${cleanPath}`;
-  }
 
   return `${cleanBase}${cleanPath}`;
 };
@@ -53,10 +46,22 @@ export const mutationFetcher = async (
     const errorData = await res.json().catch(() => ({}));
     const errorMessage =
       errorData.error ||
+      errorData.message ||
       (errorData.details
         ? JSON.stringify(errorData.details)
-        : "Terjadi kesalahan saat memproses permintaan.");
-    throw new Error(errorMessage);
+        : `HTTP ${res.status}: Terjadi kesalahan saat memproses permintaan.`);
+    
+    const error = new Error(errorMessage);
+    (error as any).status = res.status;
+    (error as any).details = errorData;
+    
+    console.error(`[SWR Mutation Error] ${arg.method} ${fullUrl}:`, {
+      status: res.status,
+      message: errorMessage,
+      details: errorData,
+    });
+    
+    throw error;
   }
 
   return res.json();

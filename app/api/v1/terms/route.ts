@@ -1,6 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createTerm, findTerms } from "@/repositories/terms.repositories";
-import { createTermSchema, termQuerySchema } from "@/schemas/terms.dto";
+import type { ZodError } from "zod";
+import { createTerm, findTerms, updateTerm } from "@/repositories/terms.repositories";
+import { 
+  createTermSchema, 
+  termQuerySchema, 
+  draftTermSchema,
+  publishTermSchema,
+} from "@/schemas/terms.dto";
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +28,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching terms:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error", details: error instanceof Error ? error.message : String(error) },
       { status: 500 },
     );
   }
@@ -31,21 +37,70 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const parsedBody = createTermSchema.safeParse(body);
+    
+    // Validate based on contentStatus
+    const schema = body.contentStatus === "DRAFT" ? draftTermSchema : publishTermSchema;
+    const parsedBody = schema.safeParse(body);
 
     if (!parsedBody.success) {
       return NextResponse.json(
-        { error: "Invalid data", details: parsedBody.error.flatten() },
+        { error: "Validation Error", details: parsedBody.error.flatten() },
         { status: 400 },
       );
     }
 
-    const newTerm = await createTerm(parsedBody.data);
-    return NextResponse.json(newTerm, { status: 201 });
-  } catch (error) {
+    const newTerm = await createTerm(parsedBody.data as any);
+    return NextResponse.json({ data: newTerm }, { status: 201 });
+  } catch (error: any) {
     console.error("Error creating term:", error);
+    if (error.code === "23505") {
+      return NextResponse.json(
+        { error: "Unique constraint violation", details: error.detail },
+        { status: 409 },
+      );
+    }
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error", details: error?.message || String(error) },
+      { status: 500 },
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const id = body.id;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID is required for updates" },
+        { status: 400 },
+      );
+    }
+
+    // Validate based on contentStatus
+    const schema = body.contentStatus === "DRAFT" ? draftTermSchema : publishTermSchema;
+    const parsedBody = schema.safeParse(body);
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        { error: "Validation Error", details: parsedBody.error.flatten() },
+        { status: 400 },
+      );
+    }
+
+    const updatedTerm = await updateTerm(id, parsedBody.data as any);
+    return NextResponse.json({ data: updatedTerm }, { status: 200 });
+  } catch (error: any) {
+    console.error("Error updating term:", error);
+    if (error.code === "23505") {
+      return NextResponse.json(
+        { error: "Unique constraint violation", details: error.detail },
+        { status: 409 },
+      );
+    }
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error?.message || String(error) },
       { status: 500 },
     );
   }

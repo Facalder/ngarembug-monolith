@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { findCafes } from "@/repositories/cafes.repositories";
-import { cafeQuerySchema } from "../../../../schemas/cafes.dto";
+import type { ZodError } from "zod";
+import { findCafes, createCafe, updateCafe } from "@/repositories/cafes.repositories";
+import { cafeQuerySchema, draftCafeSchema, publishCafeSchema, updateCafeSchema } from "@/schemas/cafes.dto";
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,20 +35,20 @@ export async function GET(request: NextRequest) {
   }
 }
 
-import type { ZodError } from "zod";
-import { createCafe } from "@/repositories/cafes.repositories";
-import { createCafeSchema } from "../../../../schemas/cafes.dto";
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const parsedData = createCafeSchema.parse(body);
+    
+    // Validate based on contentStatus
+    const schema = body.contentStatus === "DRAFT" ? draftCafeSchema : publishCafeSchema;
+    const parsedData = schema.parse(body);
 
-    const newCafe = await createCafe(parsedData);
+    const newCafe = await createCafe(parsedData as any);
 
-    return NextResponse.json(newCafe, { status: 201 });
+    return NextResponse.json({ data: newCafe }, { status: 201 });
   } catch (error: any) {
     if (error?.name === "ZodError") {
+      console.error("POST Validation Error:", error);
       return NextResponse.json(
         { error: "Validation Error", details: (error as ZodError).flatten() },
         { status: 400 },
@@ -65,7 +66,50 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error", details: error?.message || String(error) },
+      { status: 500 },
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const id = body.id;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID is required for updates" },
+        { status: 400 },
+      );
+    }
+
+    // Validate based on contentStatus
+    const schema = body.contentStatus === "DRAFT" ? draftCafeSchema : publishCafeSchema;
+    const parsedData = schema.parse(body);
+
+    const updatedCafe = await updateCafe(id, parsedData as any);
+
+    return NextResponse.json({ data: updatedCafe }, { status: 200 });
+  } catch (error: any) {
+    if (error?.name === "ZodError") {
+      console.error("PUT Validation Error:", error);
+      return NextResponse.json(
+        { error: "Validation Error", details: (error as ZodError).flatten() },
+        { status: 400 },
+      );
+    }
+
+    console.error("Error updating cafe:", error);
+    if (error.code === "23505") {
+      return NextResponse.json(
+        { error: "Unique constraint violation", details: error.detail },
+        { status: 409 },
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error?.message || String(error) },
       { status: 500 },
     );
   }

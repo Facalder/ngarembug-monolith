@@ -29,6 +29,7 @@ export type FilterOption = {
 export type Filter = {
   key: string;
   label: string;
+  description?: string;
   options: FilterOption[];
 };
 
@@ -39,7 +40,6 @@ import {
   PRICE_RANGE_OPTIONS,
   REGION_OPTIONS,
   REVIEW_STATUS_OPTIONS,
-  STAR_RATING_OPTIONS,
   VISITOR_TYPE_OPTIONS,
 } from "@/globals/data-options";
 
@@ -52,7 +52,6 @@ const FILTER_MAPPING: Record<
   priceRange: { label: "Rentang Harga", options: PRICE_RANGE_OPTIONS },
   contentStatus: { label: "Status", options: CONTENT_STATUS_OPTIONS },
   reviewStatus: { label: "Status Review", options: REVIEW_STATUS_OPTIONS },
-  averageRating: { label: "Rating", options: STAR_RATING_OPTIONS },
   visitorType: { label: "Tipe Pengunjung", options: VISITOR_TYPE_OPTIONS },
   days: { label: "Hari", options: DAYS_OPTIONS },
 };
@@ -100,7 +99,7 @@ export function TableToolbar({
   return (
     <div className="flex flex-col gap-4 md:gap-6 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-1 items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-        <div className="relative w-full sm:max-w-xs min-w-[200px]">
+        <div className="relative w-full sm:max-w-xs min-w-50">
           <Input
             placeholder={searchPlaceholder}
             defaultValue={searchParams.get("search")?.toString()}
@@ -149,7 +148,12 @@ export function TableToolbar({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuLabel>Filter by {filter.label}</DropdownMenuLabel>
+              <DropdownMenuLabel>{filter.label}</DropdownMenuLabel>
+              {filter.description && (
+                <p className="px-2 py-1 text-xs text-muted-foreground">
+                  {filter.description}
+                </p>
+              )}
               <DropdownMenuSeparator />
               {filter.options.map((option) => {
                 // Get raw value, split by , if present, ensure array

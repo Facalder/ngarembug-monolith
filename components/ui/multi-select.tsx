@@ -260,7 +260,7 @@ export function MultiSelect({
             </div>
 
             {/* Options List - structure ready for virtualization if needed */}
-            <div className="flex flex-col gap-0.5 max-h-[300px] overflow-y-auto">
+            <div className="flex flex-col gap-0.5 max-h-75 overflow-y-auto">
               {/* Select All Option */}
               {/** biome-ignore lint/a11y/useSemanticElements: <Males lagi kalo dibenerin takut berat> */}
               <div

@@ -11,7 +11,7 @@ export const priceRange = pgEnum("PriceRange", [
   "HIGH",
   "PREMIUM",
 ]);
-export const cafeType = pgEnum("CafeType", ["INDOOR_CAFE", "OUTDOOR_CAFE"]);
+export const cafeType = pgEnum("CafeType", ["INDOOR_CAFE", "OUTDOOR_CAFE", "INDOOR_OUTDOOR_CAFE"]);
 export const region = pgEnum("Region", [
   "SUKABIRUS",
   "SUKAPURA",
@@ -19,6 +19,7 @@ export const region = pgEnum("Region", [
   "BUAH BATU",
   "DAYEUH_KOLOT",
   "CIGANITRI",
+  "CIJAGRA",
   "BOJONGSOANG",
 ]);
 export const reviewStatus = pgEnum("ReviewStatus", [
