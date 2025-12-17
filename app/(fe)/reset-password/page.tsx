@@ -1,6 +1,9 @@
-'use client'
-
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Suspense } from "react";
 import { ResetPasswordForm } from "@/components/form/reset-password-form";
+
+// ... existing imports
 
 export default function Page() {
   return (
@@ -11,7 +14,18 @@ export default function Page() {
           <p className="text-muted-foreground">Masukan password baru anda</p>
         </div>
 
-        <ResetPasswordForm />
+        <Suspense
+          fallback={
+            <div className="flex justify-center py-10">
+              <HugeiconsIcon
+                icon={Loading03Icon}
+                className="animate-spin size-8 text-primary"
+              />
+            </div>
+          }
+        >
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   );
