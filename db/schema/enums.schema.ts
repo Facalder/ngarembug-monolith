@@ -1,43 +1,53 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
 export const contentStatus = pgEnum("ContentStatus", [
-  "DRAFT",
-  "PUBLISHED",
-  "ARCHIVED",
+  "draft",
+  "published",
+  "archived",
 ]);
+
 export const priceRange = pgEnum("PriceRange", [
-  "LOW",
-  "MEDIUM",
-  "HIGH",
-  "PREMIUM",
+  "murah",
+  "sedang",
+  "mahal",
+  "premium",
 ]);
-export const cafeType = pgEnum("CafeType", ["INDOOR_CAFE", "OUTDOOR_CAFE", "INDOOR_OUTDOOR_CAFE"]);
+
+export const cafeType = pgEnum("CafeType", [
+  "indoor_cafe",
+  "outdoor_cafe",
+  "indoor_outdoor_cafe",
+]);
+
 export const region = pgEnum("Region", [
-  "SUKABIRUS",
-  "SUKAPURA",
-  "BATUNUNGGAL",
-  "BUAH BATU",
-  "DAYEUH_KOLOT",
-  "CIGANITRI",
-  "CIJAGRA",
-  "BOJONGSOANG",
+  "sukabirus",
+  "sukapura",
+  "batununggal",
+  "buah_batu",
+  "dayeuh_kolot",
+  "ciganitri",
+  "cijagra",
+  "bojongsoang",
 ]);
+
 export const reviewStatus = pgEnum("ReviewStatus", [
-  "APPROVED",
-  "REJECTED",
-  "PENDING",
+  "approved",
+  "rejected",
+  "pending",
 ]);
+
 export const starRating = pgEnum("StarRating", [
-  "ONE",
-  "TWO",
-  "THREE",
-  "FOUR",
-  "FIVE",
+  "satu",
+  "dua",
+  "tiga",
+  "empat",
+  "lima",
 ]);
+
 export const visitorType = pgEnum("VisitorType", [
-  "FAMILY",
-  "COUPLE",
-  "SOLO",
-  "BUSINESS",
-  "FRIENDS",
+  "keluarga",
+  "pasangan",
+  "solo",
+  "bisnis",
+  "teman",
 ]);

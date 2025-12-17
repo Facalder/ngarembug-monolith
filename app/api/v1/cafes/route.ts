@@ -1,7 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { ZodError } from "zod";
-import { findCafes, createCafe, updateCafe } from "@/repositories/cafes.repositories";
-import { cafeQuerySchema, draftCafeSchema, publishCafeSchema } from "@/schemas/cafes.dto";
+import {
+  createCafe,
+  findCafes,
+  updateCafe,
+} from "@/repositories/cafes.repositories";
+import {
+  cafeQuerySchema,
+  draftCafeSchema,
+  publishCafeSchema,
+} from "@/schemas/cafes.dto";
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,9 +46,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Validate based on contentStatus
-    const schema = body.contentStatus === "DRAFT" ? draftCafeSchema : publishCafeSchema;
+    const schema =
+      body.contentStatus === "draft" ? draftCafeSchema : publishCafeSchema;
     const parsedData = schema.parse(body);
 
     const newCafe = await createCafe(parsedData as any);
@@ -66,7 +75,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Internal Server Error", details: error?.message || String(error) },
+      {
+        error: "Internal Server Error",
+        details: error?.message || String(error),
+      },
       { status: 500 },
     );
   }
@@ -85,7 +97,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Validate based on contentStatus
-    const schema = body.contentStatus === "DRAFT" ? draftCafeSchema : publishCafeSchema;
+    const schema =
+      body.contentStatus === "draft" ? draftCafeSchema : publishCafeSchema;
     const parsedData = schema.parse(body);
 
     const updatedCafe = await updateCafe(id, parsedData as any);
@@ -109,7 +122,10 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Internal Server Error", details: error?.message || String(error) },
+      {
+        error: "Internal Server Error",
+        details: error?.message || String(error),
+      },
       { status: 500 },
     );
   }

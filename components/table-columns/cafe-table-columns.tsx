@@ -23,9 +23,9 @@ export const cafeColumns: Column<Cafe>[] = [
     sortable: true,
     render: (row) => {
       const typeLabels: Record<string, string> = {
-        INDOOR_CAFE: "Indoor",
-        OUTDOOR_CAFE: "Outdoor",
-        INDOOR_OUTDOOR_CAFE: "Indoor & Outdoor",
+        indoor_cafe: "Indoor",
+        outdoor_cafe: "Outdoor",
+        indoor_outdoor_cafe: "Indoor & Outdoor",
       };
       return (
         <span className="capitalize">
@@ -53,10 +53,10 @@ export const cafeColumns: Column<Cafe>[] = [
     sortable: true,
     render: (row) => {
       const priceLabels: Record<string, string> = {
-        LOW: "Murah",
-        MEDIUM: "Sedang",
-        HIGH: "Mahal",
-        PREMIUM: "Premium",
+        low: "Murah",
+        medium: "Sedang",
+        high: "Mahal",
+        premium: "Premium",
       };
       return (
         <span className="whitespace-nowrap">{priceLabels[row.priceRange] || row.priceRange}</span>

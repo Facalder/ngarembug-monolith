@@ -9,6 +9,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { notFound } from "next/navigation";
+import { ReviewModal } from "@/components/modal/review-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ResponsiveImage } from "@/components/ui/responsive-image";
@@ -23,7 +24,8 @@ export default async function CafeDetailPage({ params }: PageProps) {
 
     // Fetch cafe by slug
     const { data } = await findCafes({
-        slug, limit: 1,
+        slug,
+        limit: 1,
         region: undefined,
         cafeType: undefined,
         priceRange: undefined,
@@ -31,7 +33,7 @@ export default async function CafeDetailPage({ params }: PageProps) {
         facilities: undefined,
         terms: undefined,
         contentStatus: undefined,
-        page: 1
+        page: 1,
     });
     const cafe = data[0];
 
@@ -120,9 +122,9 @@ export default async function CafeDetailPage({ params }: PageProps) {
                         <h2 className="text-2xl font-bold mb-4">Reviews</h2>
                         <div className="rounded-lg border border-dashed p-8 text-center bg-muted/30">
                             <p className="text-muted-foreground mb-4">
-                                Reviews feature is coming soon!
+                                Belum ada review. Jadilah yang pertama mereview!
                             </p>
-                            <Button disabled>Write a Review</Button>
+                            <ReviewModal cafeId={cafe.id} />
                         </div>
                     </section>
                 </div>

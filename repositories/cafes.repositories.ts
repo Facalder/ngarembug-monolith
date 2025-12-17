@@ -61,15 +61,15 @@ export const findCafes = async (params: CafeQuery) => {
         sql`FLOOR(${cafes.averageRating})`,
         averageRating.map((r) => {
           switch (r) {
-            case "ONE":
+            case "one":
               return 1;
-            case "TWO":
+            case "two":
               return 2;
-            case "THREE":
+            case "three":
               return 3;
-            case "FOUR":
+            case "four":
               return 4;
-            case "FIVE":
+            case "five":
               return 5;
             default:
               return 0;

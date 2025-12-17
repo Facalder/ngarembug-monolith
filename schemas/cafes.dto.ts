@@ -48,7 +48,7 @@ export const createCafeSchema = z.object({
   gallery: z.array(z.string()).optional(),
   menu: z.array(z.string()).optional(),
 
-  contentStatus: z.enum(contentStatus.enumValues).default("DRAFT"),
+  contentStatus: z.enum(contentStatus.enumValues).default("draft"),
   facilities: z
     .array(
       z.object({
@@ -81,11 +81,11 @@ export const draftCafeSchema = z.object({
   description: z.string().optional().default(''),
 
   // Detail Kafe
-  cafeType: z.enum(cafeType.enumValues).optional().default('INDOOR_CAFE'),
+  cafeType: z.enum(cafeType.enumValues).optional().default('indoor_cafe'),
   capacity: z.coerce.number().min(0).default(0),
 
   // Lokasi & Kontak
-  region: z.enum(region.enumValues).optional().default('SUKABIRUS'),
+  region: z.enum(region.enumValues).optional().default('sukabirus'),
   distance: z.coerce.number().min(0).default(0),
   address: z.string().optional().default(''),
   phone: z.string().max(20).optional().nullable().default(''),
@@ -94,7 +94,7 @@ export const draftCafeSchema = z.object({
   mapLink: z.string().optional().default(''),
 
   // Akomodasi
-  priceRange: z.enum(priceRange.enumValues).optional().default('LOW'),
+  priceRange: z.enum(priceRange.enumValues).optional().default('murah'),
   pricePerPerson: z.coerce.number().min(0).default(0),
 
   // Assets
@@ -103,7 +103,7 @@ export const draftCafeSchema = z.object({
   menu: z.array(z.string()).optional().default([]),
 
   // Status & Relations
-  contentStatus: z.enum(contentStatus.enumValues).default("DRAFT"),
+  contentStatus: z.enum(contentStatus.enumValues).default("draft"),
   facilities: z
     .array(
       z.object({
@@ -219,7 +219,7 @@ export const cafeQuerySchema = z.object({
     .transform((val) => {
       if (!val) return undefined;
       const inputs = Array.isArray(val) ? val : val.split(",");
-      const validRatings = ["ONE", "TWO", "THREE", "FOUR", "FIVE"];
+      const validRatings = ["one", "two", "three", "four", "five"];
       return inputs.filter((item) => validRatings.includes(item));
     }),
 

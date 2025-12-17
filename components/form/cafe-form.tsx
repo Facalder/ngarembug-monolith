@@ -73,7 +73,7 @@ interface FacilityItem {
 export function CafeForm({ initialData }: CafeFormProps) {
   const router = useRouter();
   const [submitStatus, setSubmitStatus] = useState<
-    "DRAFT" | "PUBLISHED" | null
+    "draft" | "published" | null
   >(null);
 
   // States for Image Manager
@@ -153,7 +153,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
       thumbnail: initialData?.thumbnail || "",
       gallery: initialData?.gallery || [],
       menu: initialData?.menu || [],
-      contentStatus: initialData?.contentStatus || "DRAFT",
+      contentStatus: initialData?.contentStatus || "draft",
       facilities: initialData?.facilities || [],
       terms: initialData?.terms || [],
     },
@@ -240,7 +240,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
 
   const onSubmit = async (
     values: CreateCafe,
-    status: "DRAFT" | "PUBLISHED",
+    status: "draft" | "published",
   ) => {
     setSubmitStatus(status);
     try {
@@ -254,11 +254,11 @@ export function CafeForm({ initialData }: CafeFormProps) {
       const result = await trigger({ method, body: payload });
 
       toast.success(
-        status === "PUBLISHED"
+        status === "published"
           ? "Kafe berhasil dipublikasikan!"
           : "Kafe berhasil disimpan sebagai draft!",
         {
-          description: `Kafe "${values.name}" telah ${status === "PUBLISHED" ? "dipublikasikan" : "disimpan"}.`,
+          description: `Kafe "${values.name}" telah ${status === "published" ? "dipublikasikan" : "disimpan"}.`,
         },
       );
 
@@ -283,7 +283,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
       const values = form.getValues();
       // Validate dengan draft schema (less strict)
       const validatedValues = draftCafeSchema.parse(values);
-      await onSubmit(validatedValues as CreateCafe, "DRAFT");
+      await onSubmit(validatedValues as CreateCafe, "draft");
 
       router.push("/dashboard/cafes");
       router.refresh();
@@ -307,7 +307,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
       const values = form.getValues();
       // Validate dengan publish schema (strict)
       const validatedValues = publishCafeSchema.parse(values);
-      await onSubmit(validatedValues as CreateCafe, "PUBLISHED");
+      await onSubmit(validatedValues as CreateCafe, "published");
     } catch (error) {
       if (error instanceof ZodError) {
         const firstError = error.issues[0];
@@ -430,9 +430,9 @@ export function CafeForm({ initialData }: CafeFormProps) {
                           <SelectContent>
                             {cafeType.enumValues.map((type) => {
                               const typeLabels: Record<string, string> = {
-                                INDOOR_CAFE: "Indoor",
-                                OUTDOOR_CAFE: "Outdoor",
-                                INDOOR_OUTDOOR_CAFE: "Indoor & Outdoor",
+                                indoor_cafe: "Indoor",
+                                outdoor_cafe: "Outdoor",
+                                indoor_outdoor_cafe: "Indoor & Outdoor",
                               };
                               return (
                                 <SelectItem key={type} value={type}>
@@ -985,8 +985,8 @@ export function CafeForm({ initialData }: CafeFormProps) {
       <FormLayout.Actions>
         <EntryActionPanel
           isLoading={isMutating}
-          loadingDraft={isMutating && submitStatus === "DRAFT"}
-          loadingPublish={isMutating && submitStatus === "PUBLISHED"}
+          loadingDraft={isMutating && submitStatus === "draft"}
+          loadingPublish={isMutating && submitStatus === "published"}
           onCancel={() => router.back()}
           onSubmitDraft={handleSubmitDraft}
           onSubmitPublish={handleSubmitPublish}

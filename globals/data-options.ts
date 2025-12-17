@@ -1,52 +1,51 @@
 export const CONTENT_STATUS_OPTIONS = [
-  { value: "DRAFT", label: "Draft", alias: "dft" },
-  { value: "PUBLISHED", label: "Dipublikasikan", alias: "pub" },
-  { value: "ARCHIVED", label: "Diarsipkan", alias: "arc" },
+  { value: "draft", label: "Draft", alias: "dft" },
+  { value: "published", label: "Dipublikasikan", alias: "pub" },
+  { value: "archived", label: "Diarsipkan", alias: "arc" },
 ] as const;
 
 export const PRICE_RANGE_OPTIONS = [
-  { value: "LOW", label: "Murah", alias: "low" },
-  { value: "MEDIUM", label: "Sedang", alias: "mid" },
-  { value: "HIGH", label: "Mahal", alias: "high" },
-  { value: "PREMIUM", label: "Premium", alias: "prem" },
+  { value: "low", label: "Murah", alias: "low" },
+  { value: "medium", label: "Sedang", alias: "mid" },
+  { value: "high", label: "Mahal", alias: "high" },
+  { value: "premium", label: "Premium", alias: "prem" },
 ] as const;
 
 export const CAFE_TYPE_OPTIONS = [
-  { value: "INDOOR_CAFE", label: "Indoor", alias: "in" },
-  { value: "OUTDOOR_CAFE", label: "Outdoor", alias: "out" },
-  { value: "INDOOR_OUTDOOR_CAFE", label: "Indoor & Outdoor", alias: "io" },
+  { value: "indoor_cafe", label: "Indoor Cafe", alias: "in" },
+  { value: "outdoor_cafe", label: "Outdoor Cafe", alias: "out" },
+  { value: "indoor_outdoor_cafe", label: "Indoor & Outdoor Cafe", alias: "io" },
 ] as const;
 
 export const REGION_OPTIONS = [
-  { value: "SUKABIRUS", label: "Sukabirus", alias: "skb" },
-  { value: "SUKAPURA", label: "Sukapura", alias: "skp" },
-  { value: "BATUNUNGGAL", label: "Batununggal", alias: "btn" },
-  { value: "BUAH BATU", label: "Buah Batu", alias: "bbt" },
-  { value: "DAYEUH_KOLOT", label: "Dayeuh Kolot", alias: "dyk" },
-  { value: "CIGANITRI", label: "Ciganitri", alias: "cgn" },
-  { value: "CIJAGRA", label: "Cijagra", alias: "cjg" },
-  { value: "BOJONGSOANG", label: "Bojongsoang", alias: "bjs" },
+  { value: "sukabirus", label: "Sukabirus", alias: "skb" },
+  { value: "sukapura", label: "Sukapura", alias: "skp" },
+  { value: "batununggal", label: "Batununggal", alias: "btn" },
+  { value: "buah_batu", label: "Buah Batu", alias: "bbt" },
+  { value: "dayeuh_kolot", label: "Dayeuh Kolot", alias: "dyk" },
+  { value: "ciganitri", label: "Ciganitri", alias: "cgn" },
+  { value: "cijagra", label: "Cijagra", alias: "cjg" },
+  { value: "bojongsoang", label: "Bojongsoang", alias: "bjs" },
 ] as const;
 
 export const REVIEW_STATUS_OPTIONS = [
-  { value: "APPROVED", label: "Disetujui", alias: "app" },
-  { value: "REJECTED", label: "Ditolak", alias: "rej" },
-  { value: "PENDING", label: "Menunggu", alias: "pen" },
+  { value: "approved", label: "Diterima", alias: "app" },
+  { value: "rejected", label: "Ditolak", alias: "rej" },
+  { value: "pending", label: "Pending", alias: "pen" },
 ] as const;
 
 export const STAR_RATING_OPTIONS = [
-  { value: "ONE", label: "1 Bintang", alias: "1" },
-  { value: "TWO", label: "2 Bintang", alias: "2" },
-  { value: "THREE", label: "3 Bintang", alias: "3" },
-  { value: "FOUR", label: "4 Bintang", alias: "4" },
-  { value: "FIVE", label: "5 Bintang", alias: "5" },
+  { value: "one", label: "Satu", alias: "1" },
+  { value: "two", label: "Dua", alias: "2" },
+  { value: "three", label: "Tiga", alias: "3" },
+  { value: "four", label: "Empat", alias: "4" },
+  { value: "five", label: "Lima", alias: "5" },
 ] as const;
 
 export const VISITOR_TYPE_OPTIONS = [
-  { value: "FAMILY", label: "Keluarga", alias: "fam" },
-  { value: "COUPLE", label: "Pasangan", alias: "cpl" },
-  { value: "SOLO", label: "Sendiri", alias: "sol" },
-  { value: "BUSINESS", label: "Bisnis", alias: "bus" },
-  { value: "FRIENDS", label: "Teman", alias: "frn" },
+  { value: "family", label: "Keluarga", alias: "fam" },
+  { value: "couple", label: "Pasangan", alias: "cpl" },
+  { value: "solo", label: "Solo", alias: "sol" },
+  { value: "business", label: "Bisnis", alias: "bus" },
+  { value: "friends", label: "Teman", alias: "frn" },
 ] as const;
-

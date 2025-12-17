@@ -29,7 +29,7 @@ const cafesTable = pgTable.withRLS(
     slug: varchar("slug", { length: 120 }).notNull().unique(),
     description: text("description"),
 
-    cafeType: cafeType("cafe_type").notNull().default("INDOOR_CAFE"),
+    cafeType: cafeType("cafe_type").notNull().default("indoor_cafe"),
     region: region("region").notNull(),
     capacity: smallint("capacity").notNull().default(0),
     distance: smallint("distance").default(0), // Jarak dari Telkom University
@@ -62,7 +62,7 @@ const cafesTable = pgTable.withRLS(
 
     contentStatus: contentStatus("content_status")
       .notNull()
-      .default("PUBLISHED"),
+      .default("published"),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
