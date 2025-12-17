@@ -167,16 +167,24 @@ const createAliasSchema = <T extends string>(
       const mapped = inputs
         .map((item) => {
           // Normalize input
-          // 1. Try direct match in alias map (e.g. "skb" -> "SUKABIRUS")
-          // 2. Try lowercase match in alias map (e.g. "SKB" -> "skb" -> "SUKABIRUS")
-          // 3. Try toUpperCase (for enum values like "bojongsoang" -> "BOJONGSOANG")
-          return (
+          const transformed = (
             aliasMap[item] ||
             aliasMap[item.toLowerCase()] ||
             item.toUpperCase()
           );
+          return transformed;
         })
-        .filter((item): item is T => values.includes(item as T));
+        .filter((item): item is T => { 
+            const isValid = values.includes(item as T);
+            if (!isValid) {
+                console.log(`[Validation Debug] Invalid item: ${item}. Expected one of: ${values.join(", ")}`);
+            }
+            return isValid;
+        });
+
+      if (mapped.length === 0) {
+          console.log(`[Validation Debug] All items filtered out. Input: ${val}`);
+      }
 
       return mapped.length > 0 ? mapped : undefined;
     });

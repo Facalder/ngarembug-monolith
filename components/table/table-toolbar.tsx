@@ -36,7 +36,6 @@ export type Filter = {
 import {
   CAFE_TYPE_OPTIONS,
   CONTENT_STATUS_OPTIONS,
-  DAYS_OPTIONS,
   PRICE_RANGE_OPTIONS,
   REGION_OPTIONS,
   REVIEW_STATUS_OPTIONS,
@@ -53,8 +52,9 @@ const FILTER_MAPPING: Record<
   contentStatus: { label: "Status", options: CONTENT_STATUS_OPTIONS },
   reviewStatus: { label: "Status Review", options: REVIEW_STATUS_OPTIONS },
   visitorType: { label: "Tipe Pengunjung", options: VISITOR_TYPE_OPTIONS },
-  days: { label: "Hari", options: DAYS_OPTIONS },
 };
+
+// ... imports
 
 interface TableToolbarProps {
   searchPlaceholder?: string;
@@ -63,6 +63,13 @@ interface TableToolbarProps {
   columns?: { key: string | number | symbol }[];
   onRefresh?: () => void;
   isRefreshing?: boolean;
+
+  // Controlled State Overrides (Optional - for useApiQuery or local state)
+  search?: string;
+  onSearch?: (term: string) => void;
+
+  activeFilters?: Record<string, string | string[]>;
+  onFilterChange?: (key: string, value: string | string[] | null) => void;
 }
 
 export function TableToolbar({
@@ -71,8 +78,53 @@ export function TableToolbar({
   columns = [],
   onRefresh,
   isRefreshing,
+
+  search: controlledSearch,
+  onSearch: controlledOnSearch,
+  activeFilters: controlledFilters,
+  onFilterChange: controlledOnFilterChange,
 }: TableToolbarProps) {
-  const { searchParams, setSearch, setFilter } = useTableState();
+  // Fallback to legacy hook if no controlled props
+  const { searchParams, setSearch: hookSetSearch, setFilter: hookSetFilter } = useTableState();
+
+  const isControlled = controlledSearch !== undefined || controlledFilters !== undefined;
+
+  const currentSearch = isControlled ? controlledSearch : searchParams.get("search")?.toString();
+
+  // Create unified handlers
+  const handleSearch = useDebouncedCallback((term: string) => {
+    if (controlledOnSearch) {
+      controlledOnSearch(term);
+    } else {
+      hookSetSearch(term);
+    }
+  }, 300);
+
+  // Helper to get active filter value
+  const getFilterValue = (key: string): string[] => {
+    if (controlledFilters) {
+      const val = controlledFilters[key];
+      if (Array.isArray(val)) return val;
+      if (val) return String(val).split(",");
+      return [];
+    }
+    const val = searchParams.get(key);
+    return val ? val.split(",") : [];
+  };
+
+  const handleFilter = (key: string, values: string[]) => {
+    // Logic to sync back
+    // If controlled, we pass the values array directly (or join it if the handler expects atomic updates?)
+    // usage in DropdownMenu below passes "next" which is string[]
+    if (controlledOnFilterChange) {
+      controlledOnFilterChange(key, values);
+    } else {
+      hookSetFilter(key, values);
+    }
+  };
+
+  // Handle Search
+  // (Note: handleSearch is already defined above using useDebouncedCallback)
 
   const dynamicFilters: Filter[] = columns
     .map((col) => {
@@ -91,18 +143,13 @@ export function TableToolbar({
 
   const activeFilters = [...dynamicFilters, ...filters];
 
-  // Handle Search
-  const handleSearch = useDebouncedCallback((term: string) => {
-    setSearch(term);
-  }, 300);
-
   return (
     <div className="flex flex-col gap-4 md:gap-6 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-1 items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
         <div className="relative w-full sm:max-w-xs min-w-50">
           <Input
             placeholder={searchPlaceholder}
-            defaultValue={searchParams.get("search")?.toString()}
+            defaultValue={currentSearch}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-9 h-9"
           />
@@ -140,9 +187,9 @@ export function TableToolbar({
                   className="h-4 w-4"
                 />
                 {filter.label}
-                {searchParams.get(filter.key) && (
+                {getFilterValue(filter.key).length > 0 && (
                   <span className="bg-primary text-primary-foreground ml-1 flex h-4 w-4 items-center justify-center rounded-sm text-[10px] p-0.5">
-                    {searchParams.get(filter.key)?.split(",").length}
+                    {getFilterValue(filter.key).length}
                   </span>
                 )}
               </Button>
@@ -156,11 +203,9 @@ export function TableToolbar({
               )}
               <DropdownMenuSeparator />
               {filter.options.map((option) => {
-                // Get raw value, split by , if present, ensure array
-                const rawParam = searchParams.get(filter.key);
-                const currentValues = rawParam ? rawParam.split(",") : [];
+                const currentValues = getFilterValue(filter.key);
 
-                // Check case-insensitively to support lowercase URL params
+                // Check case-insensitively
                 const isChecked = currentValues.some(
                   (v) => v.toLowerCase() === String(option.value).toLowerCase(),
                 );
@@ -170,17 +215,13 @@ export function TableToolbar({
                     key={option.value}
                     checked={isChecked}
                     onCheckedChange={(checked) => {
-                      // Usahakan URL param lowercase semua
                       const valueStr = String(option.value).toLowerCase();
-                      let next: string[];
-
-                      // We need to work with lowercase values for comparison/filtering to be consistent
                       const currentValuesLower = currentValues.map((v) =>
                         v.toLowerCase(),
                       );
+                      let next: string[];
 
                       if (checked) {
-                        // Add if not present (although Dropdown handles display, logic needs to be safe)
                         if (!currentValuesLower.includes(valueStr)) {
                           next = [...currentValues, valueStr];
                         } else {
@@ -191,19 +232,19 @@ export function TableToolbar({
                           (v) => v.toLowerCase() !== valueStr,
                         );
                       }
-                      setFilter(filter.key, next);
+                      handleFilter(filter.key, next);
                     }}
                   >
                     {option.label}
                   </DropdownMenuCheckboxItem>
                 );
               })}
-              {searchParams.get(filter.key) && (
+              {getFilterValue(filter.key).length > 0 && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuCheckboxItem
                     checked={false}
-                    onSelect={() => setFilter(filter.key, [])}
+                    onSelect={() => handleFilter(filter.key, [])}
                     className="justify-center text-center"
                   >
                     Clear filters

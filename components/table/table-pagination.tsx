@@ -23,14 +23,33 @@ interface TablePaginationProps {
   total: number;
   totalPages: number;
   isLoading?: boolean;
+
+  // Controlled State Overrides
+  page?: number;
+  limit?: number;
+  onPageChange?: (page: number) => void;
+  onLimitChange?: (limit: number) => void;
 }
 
 export function TablePagination({
   total,
   totalPages,
   isLoading,
+
+  page: controlledPage,
+  limit: controlledLimit,
+  onPageChange,
+  onLimitChange
 }: TablePaginationProps) {
-  const { page, limit, setPage, setLimit } = useTableState();
+  const { page: hookPage, limit: hookLimit, setPage: hookSetPage, setLimit: hookSetLimit } = useTableState();
+
+  const isControlled = controlledPage !== undefined || controlledLimit !== undefined;
+
+  const page = isControlled ? (controlledPage ?? 1) : hookPage;
+  const limit = isControlled ? (controlledLimit ?? 10) : hookLimit;
+
+  const setPage = isControlled ? (onPageChange || (() => { })) : hookSetPage;
+  const setLimit = isControlled ? (onLimitChange || (() => { })) : hookSetLimit;
 
   if (isLoading) {
     return (
@@ -61,7 +80,7 @@ export function TablePagination({
             }}
           >
             <SelectTrigger className="h-8 w-17.5">
-              <SelectValue placeholder={limit} />
+              <SelectValue placeholder={`${limit}`} />
             </SelectTrigger>
             <SelectContent side="top">
               {[10, 20, 30, 40, 50].map((pageSize) => (

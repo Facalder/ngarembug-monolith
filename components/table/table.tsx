@@ -147,6 +147,11 @@ function RowActions({ id, apiEndpoint, editHref, canDelete }: RowActionsProps) {
   );
 }
 
+import { useApiQuery } from "@/lib/use-api-query";
+// ... imports
+
+// ... existing interfaces
+
 export function DataTable<T extends { id: string | number }>({
   apiEndpoint,
   columns,
@@ -156,42 +161,11 @@ export function DataTable<T extends { id: string | number }>({
   editHref,
   canDelete,
 }: DataTableProps<T>) {
-  const { searchParams, setSort } = useTableState();
-  const searchParamsString = React.useMemo(
-    () => searchParams?.toString() || "",
-    [searchParams],
-  );
+  // Use the new hook for all state + fetching
+  const query = useApiQuery<T>({ apiEndpoint });
 
-  // Construct URL with params for SWR key
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <udah ikutin ajah>
-  const swrKey = React.useMemo(() => {
-    // Use all search params to ensure all filters (including dynamic ones) are passed to API
-    const params = new URLSearchParams(searchParams.toString());
-
-    // Ensure valid defaults for critical params if missing (optional, API handles it too)
-    if (!params.has("page")) params.set("page", "1");
-    if (!params.has("limit")) params.set("limit", "10");
-
-    const queryString = params.toString();
-    const endpoint = apiEndpoint.startsWith("/")
-      ? apiEndpoint
-      : `/${apiEndpoint}`;
-    return `${endpoint}${queryString ? `?${queryString}` : ""}`;
-  }, [searchParamsString, apiEndpoint]);
-
-  const { data, error, isLoading, mutate, isValidating } = useSWR(
-    swrKey,
-    fetcher,
-    swrConfig,
-  );
-
-  const rows = (data?.data as T[]) || [];
-  const pagination = data?.pagination || {
-    total: 0,
-    totalPages: 0,
-    page: 1,
-    limit: 10,
-  };
+  const rows = query.data;
+  const pagination = query.meta;
 
   // Sticky Helpers
   const getStickyStyle = (col: Column<T>) => {
@@ -225,8 +199,14 @@ export function DataTable<T extends { id: string | number }>({
         searchPlaceholder={searchPlaceholder}
         filters={filters}
         columns={columns}
-        onRefresh={() => mutate()}
-        isRefreshing={isValidating}
+        onRefresh={() => query.mutate()}
+        isRefreshing={query.isValidating}
+
+        // Pass controlled state from hook
+        search={query.search}
+        onSearch={query.setSearch}
+        activeFilters={query.filters}
+        onFilterChange={query.setFilter}
       />
       <div className="rounded-md border border-border overflow-hidden">
         <div className="relative w-full overflow-auto">
@@ -234,8 +214,8 @@ export function DataTable<T extends { id: string | number }>({
             <thead className="[&_tr]:border-b">
               <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                 {columns.map((col) => {
-                  const isSorted = searchParams.get("orderBy") === col.key;
-                  const sortDir = searchParams.get("orderDir");
+                  const isSorted = query.sortKey === col.key;
+                  const sortDir = query.sortDir;
 
                   return (
                     <th
@@ -252,7 +232,7 @@ export function DataTable<T extends { id: string | number }>({
                           variant="ghost"
                           size="sm"
                           className="-ml-3 h-8 data-[state=open]:bg-accent"
-                          onClick={() => setSort(String(col.key))}
+                          onClick={() => query.setSort(String(col.key))}
                         >
                           <span>{col.label}</span>
                           {isSorted ? (
@@ -285,7 +265,7 @@ export function DataTable<T extends { id: string | number }>({
               </tr>
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
-              {isLoading ? (
+              {query.isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr
                     key={i.toString()}
@@ -301,7 +281,7 @@ export function DataTable<T extends { id: string | number }>({
                     </td>
                   </tr>
                 ))
-              ) : error ? (
+              ) : query.error ? (
                 <tr>
                   <td colSpan={columns.length + 1} className="h-24 text-center">
                     <Empty>
@@ -321,17 +301,17 @@ export function DataTable<T extends { id: string | number }>({
                       <EmptyContent>
                         <Button
                           variant="outline"
-                          disabled={isValidating}
+                          disabled={query.isValidating}
                           onClick={() => {
                             console.clear();
-                            mutate();
+                            query.mutate();
                           }}
                         >
                           <HugeiconsIcon
                             icon={ReloadIcon}
-                            className={cn(isValidating && "animate-spin")}
+                            className={cn(query.isValidating && "animate-spin")}
                           />
-                          {isValidating ? "Memuat..." : "Muat Ulang"}
+                          {query.isValidating ? "Memuat..." : "Muat Ulang"}
                         </Button>
                       </EmptyContent>
                     </Empty>
@@ -354,14 +334,14 @@ export function DataTable<T extends { id: string | number }>({
                       <EmptyContent>
                         <Button
                           variant="outline"
-                          disabled={isValidating}
-                          onClick={() => mutate()}
+                          disabled={query.isValidating}
+                          onClick={() => query.mutate()}
                         >
                           <HugeiconsIcon
                             icon={ReloadIcon}
-                            className={cn(isValidating && "animate-spin")}
+                            className={cn(query.isValidating && "animate-spin")}
                           />
-                          {isValidating ? "Memuat..." : "Perbarui Data"}
+                          {query.isValidating ? "Memuat..." : "Perbarui Data"}
                         </Button>
                       </EmptyContent>
                     </Empty>
@@ -408,10 +388,14 @@ export function DataTable<T extends { id: string | number }>({
         </div>
       </div>
 
-      {!isLoading && (
+      {!query.isLoading && (
         <TablePagination
           total={pagination.total}
           totalPages={pagination.totalPages}
+          page={query.page}
+          limit={query.limit}
+          onPageChange={query.setPage}
+          onLimitChange={query.setLimit}
         />
       )}
     </div>

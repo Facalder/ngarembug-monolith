@@ -1,6 +1,5 @@
 import {
   Agreement01FreeIcons,
-  Image01FreeIcons,
   Sofa01FreeIcons,
   Store03FreeIcons,
 } from "@hugeicons/core-free-icons";
