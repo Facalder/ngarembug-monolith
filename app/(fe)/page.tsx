@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Suspense, useState } from "react";
 import useSWR from "swr";
 import { AreaCafeSection } from "@/components/section/area-cafe-section";
 import { CafeSection } from "@/components/section/cafe-section";
@@ -9,7 +11,7 @@ import { PLACEHODER_IMAGE } from "@/globals/globals";
 import { fetcher } from "@/lib/swr";
 import { useApiQuery } from "@/lib/use-api-query";
 
-export default function HomePage() {
+function HomeContent() {
   const [selectedArea, setSelectedArea] = useState("SUKAPURA");
 
   const { data: featuredCafes } = useApiQuery({
@@ -83,5 +85,22 @@ export default function HomePage() {
         }
       />
     </>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <HugeiconsIcon
+            icon={Loading03Icon}
+            className="animate-spin size-8 text-primary"
+          />
+        </div>
+      }
+    >
+      <HomeContent />
+    </Suspense>
   );
 }

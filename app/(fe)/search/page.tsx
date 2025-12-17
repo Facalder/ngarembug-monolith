@@ -8,7 +8,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { TablePagination } from "@/components/table/table-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ import {
 } from "@/globals/data-options";
 import { useApiQuery } from "@/lib/use-api-query";
 
-export default function SearchPage() {
+function SearchPageContent() {
     const query = useApiQuery({
         apiEndpoint: "cafes", // Assumes /api/v1/cafes endpoint exists and returns public list
         defaults: {
@@ -330,5 +330,36 @@ export default function SearchPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SearchPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="container mx-auto px-4 py-8">
+                    <div className="space-y-6">
+                        <div className="h-8 w-48 animate-pulse rounded-md bg-muted" />
+                        <div className="flex gap-8">
+                            <div className="hidden w-64 flex-none space-y-6 md:block">
+                                <div className="h-64 animate-pulse rounded-md bg-muted" />
+                            </div>
+                            <div className="flex-1 space-y-6">
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                                        <div
+                                            key={i}
+                                            className="h-64 animate-pulse rounded-lg bg-muted"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        >
+            <SearchPageContent />
+        </Suspense>
     );
 }
