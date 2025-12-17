@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ZodError } from "zod";
 import { Delete01Icon, ImageAdd01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
@@ -12,6 +11,7 @@ import { type Resolver, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import useSWRMutation from "swr/mutation";
+import { ZodError } from "zod";
 import { EntryActionPanel } from "@/components/entry-action-panel";
 import { FormLayout } from "@/components/form-layout";
 import {
@@ -48,6 +48,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { cafeType, priceRange, region } from "@/db/schema/enums.schema";
 import type { Image as ImageType } from "@/db/schema/images.schema";
+import { PRICE_RANGE_OPTIONS } from "@/globals/data-options";
 import { generateSlug } from "@/lib/slug";
 import { STORAGE_BUCKETS } from "@/lib/storage-constants";
 import { fetcher, mutationFetcher } from "@/lib/swr";
@@ -57,8 +58,6 @@ import {
   draftCafeSchema,
   publishCafeSchema,
 } from "@/schemas/cafes.dto";
-import { BASE_API_URL } from "@/globals/globals";
-import { PRICE_RANGE_OPTIONS } from "@/globals/data-options";
 
 interface CafeFormProps {
   initialData?: CreateCafe & { id: string };
@@ -211,9 +210,6 @@ export function CafeForm({ initialData }: CafeFormProps) {
       facilitiesData?.data?.map((f: FacilityItem) => [f.id, f]) || [],
     );
     watchedFacilities.forEach((f: FacilityItem) => {
-      // Use set to ensure we have the most up to date from form if API is stale, or vice versa?
-      // Actually API data usually has more info, but form has the optimist one.
-      // If API track doesn't have it, we MUST put form one.
       if (!apiMap.has(f.id)) {
         apiMap.set(f.id, f);
       }
@@ -249,7 +245,11 @@ export function CafeForm({ initialData }: CafeFormProps) {
     setSubmitStatus(status);
     try {
       const method = initialData?.id ? "PUT" : "POST";
-      const payload = { ...values, contentStatus: status, ...(initialData?.id && { id: initialData.id }) };
+      const payload = {
+        ...values,
+        contentStatus: status,
+        ...(initialData?.id && { id: initialData.id }),
+      };
 
       const result = await trigger({ method, body: payload });
 
@@ -285,7 +285,7 @@ export function CafeForm({ initialData }: CafeFormProps) {
       const validatedValues = draftCafeSchema.parse(values);
       await onSubmit(validatedValues as CreateCafe, "DRAFT");
 
-       router.push("/dashboard/cafes");
+      router.push("/dashboard/cafes");
       router.refresh();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -559,7 +559,9 @@ export function CafeForm({ initialData }: CafeFormProps) {
                             placeholder="08..."
                             {...field}
                             value={field.value || ""}
-                            onChange={(e) => field.onChange(e.target.value || null)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value || null)
+                            }
                             disabled={isMutating}
                           />
                         </FormControl>
@@ -581,7 +583,9 @@ export function CafeForm({ initialData }: CafeFormProps) {
                             placeholder="email@example.com"
                             {...field}
                             value={field.value || ""}
-                            onChange={(e) => field.onChange(e.target.value || null)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value || null)
+                            }
                             disabled={isMutating}
                           />
                         </FormControl>
@@ -606,12 +610,15 @@ export function CafeForm({ initialData }: CafeFormProps) {
                             placeholder="https://..."
                             {...field}
                             value={field.value || ""}
-                            onChange={(e) => field.onChange(e.target.value || null)}
+                            onChange={(e) =>
+                              field.onChange(e.target.value || null)
+                            }
                             disabled={isMutating}
                           />
                         </FormControl>
                         <FormDescription>
-                          Website resmi atau link sosial media (Instagram, Facebook, TikTok, dll). Format: https://...
+                          Website resmi atau link sosial media (Instagram,
+                          Facebook, TikTok, dll). Format: https://...
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -688,7 +695,8 @@ export function CafeForm({ initialData }: CafeFormProps) {
                           />
                         </FormControl>
                         <FormDescription>
-                          Masukkan harga dalam rupiah tanpa format (misal: 50000 untuk Rp50.000)
+                          Masukkan harga dalam rupiah tanpa format (misal: 50000
+                          untuk Rp50.000)
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

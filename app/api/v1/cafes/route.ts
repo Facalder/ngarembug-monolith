@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { ZodError } from "zod";
 import { findCafes, createCafe, updateCafe } from "@/repositories/cafes.repositories";
-import { cafeQuerySchema, draftCafeSchema, publishCafeSchema, updateCafeSchema } from "@/schemas/cafes.dto";
+import { cafeQuerySchema, draftCafeSchema, publishCafeSchema } from "@/schemas/cafes.dto";
 
 export async function GET(request: NextRequest) {
   try {

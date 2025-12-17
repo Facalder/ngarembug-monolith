@@ -213,11 +213,12 @@ export function MultiSelect({
             )}
           >
             <div className="flex items-center gap-1.5 flex-wrap flex-1 text-left">
-              {selectedOptions.length === 0 ? (
+              {selectedOptions.length === 0 && (
                 <span className="text-muted-foreground text-sm">
                   {placeholder}
                 </span>
-              ) : (
+              )}
+              {selectedOptions.length > 0 && (
                 <>
                   {selectedOptions.slice(0, maxDisplay).map((option) => (
                     <SelectionBadge
@@ -227,7 +228,7 @@ export function MultiSelect({
                     />
                   ))}
                   {selectedOptions.length > maxDisplay && (
-                    <Badge variant="secondary" className="h-6">
+                    <Badge key="more-badge" variant="secondary" className="h-6">
                       +{selectedOptions.length - maxDisplay} more
                     </Badge>
                   )}

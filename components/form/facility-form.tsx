@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ZodError } from "zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -30,13 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { generateSlug } from "@/lib/slug";
 import { mutationFetcher } from "@/lib/swr";
-import {
-  type Facility,
-  facilitySchema,
-  draftFacilitySchema,
-  publishFacilitySchema,
-} from "@/schemas/facilities.dto";
-import { BASE_API_URL } from "@/globals/globals";
+import { type Facility, facilitySchema } from "@/schemas/facilities.dto";
 
 interface FacilityFormProps {
   initialData?: Facility & { id: string; contentStatus?: string };
@@ -48,7 +41,6 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
     "DRAFT" | "PUBLISHED" | null
   >(null);
 
-  // Dynamic SWR key based on create vs edit mode
   const FACILITIES_ENDPOINT = `/facilities`;
   const key = initialData?.id
     ? `${FACILITIES_ENDPOINT}/${initialData.id}`
@@ -67,27 +59,33 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
 
   const name = form.watch("name");
 
-  // Auto-generate slug when name changes
+  // Auto-generate slug when name changes (only for new entries)
   useEffect(() => {
-    if (name) {
+    if (name && !initialData?.id) {
       const slug = generateSlug(name);
       form.setValue("slug", slug, { shouldValidate: true });
     }
-  }, [name, form]);
+  }, [name, form, initialData?.id]);
 
   const onSubmit = async (values: Facility, status: "DRAFT" | "PUBLISHED") => {
     setSubmitStatus(status);
 
     try {
       const method = initialData?.id ? "PUT" : "POST";
-      const payload = { ...values, contentStatus: status, ...(initialData?.id && { id: initialData.id }) };
+      const payload = { 
+        ...values, 
+        contentStatus: status // Status akan selalu sesuai tombol yang ditekan
+      };
 
       await trigger({ method, body: payload });
 
+      const isUpdate = initialData?.id;
+      const action = isUpdate ? "diperbarui" : "dibuat";
+
       toast.success(
         status === "PUBLISHED"
-          ? "Fasilitas berhasil dipublikasikan!"
-          : "Fasilitas berhasil disimpan sebagai draft!",
+          ? `Fasilitas berhasil ${action} dan dipublikasikan!`
+          : `Fasilitas berhasil ${action} sebagai draft!`,
         {
           description:
             status === "PUBLISHED"
@@ -105,51 +103,6 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
       });
     } finally {
       setSubmitStatus(null);
-    }
-  };
-
-  // Handle submit draft - validate dengan draftFacilitySchema (less strict)
-  const handleSubmitDraft = async () => {
-    try {
-      const values = form.getValues();
-      // Validate dengan draft schema (less strict)
-      const validatedValues = draftFacilitySchema.parse(values);
-      await onSubmit(validatedValues as Facility, "DRAFT");
-
-       router.push("/dashboard/facilities");
-      router.refresh();
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const firstError = error.issues[0];
-        toast.error("Validasi gagal", {
-          description: `${firstError.path.join(".")}: ${firstError.message}`,
-        });
-      } else if (error instanceof Error) {
-        toast.error("Validasi gagal", {
-          description: error.message,
-        });
-      }
-    }
-  };
-
-  // Handle submit publish - validate dengan publishFacilitySchema (strict)
-  const handleSubmitPublish = async () => {
-    try {
-      const values = form.getValues();
-      // Validate dengan publish schema (strict)
-      const validatedValues = publishFacilitySchema.parse(values);
-      await onSubmit(validatedValues as Facility, "PUBLISHED");
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const firstError = error.issues[0];
-        toast.error("Validasi gagal", {
-          description: `${firstError.path.join(".")}: ${firstError.message}`,
-        });
-      } else if (error instanceof Error) {
-        toast.error("Validasi gagal", {
-          description: error.message,
-        });
-      }
     }
   };
 
@@ -189,7 +142,7 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
                   )}
                 />
 
-                {/* Slug is auto-generated from name */}
+                {/* Slug is auto-generated from name for new entries */}
                 <input type="hidden" {...form.register("slug")} />
 
                 <FormField
@@ -226,8 +179,12 @@ export function FacilityForm({ initialData }: FacilityFormProps) {
           loadingDraft={isMutating && submitStatus === "DRAFT"}
           loadingPublish={isMutating && submitStatus === "PUBLISHED"}
           onCancel={handleCancel}
-          onSubmitDraft={handleSubmitDraft}
-          onSubmitPublish={handleSubmitPublish}
+          onSubmitDraft={form.handleSubmit((values) =>
+            onSubmit(values, "DRAFT"),
+          )}
+          onSubmitPublish={form.handleSubmit((values) =>
+            onSubmit(values, "PUBLISHED"),
+          )}
         />
       </FormLayout.Actions>
     </FormLayout>

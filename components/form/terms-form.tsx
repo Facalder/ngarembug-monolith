@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ZodError } from "zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -30,13 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { generateSlug } from "@/lib/slug";
 import { mutationFetcher } from "@/lib/swr";
-import {
-  type Term,
-  termSchema,
-  draftTermSchema,
-  publishTermSchema,
-} from "@/schemas/terms.dto";
-import { BASE_API_URL } from "@/globals/globals";
+import { type Term, termSchema } from "@/schemas/terms.dto";
 
 interface TermsFormProps {
   initialData?: Term & { id: string; contentStatus?: string };
@@ -48,11 +41,10 @@ export function TermsForm({ initialData }: TermsFormProps) {
     "DRAFT" | "PUBLISHED" | null
   >(null);
 
-  // Dynamic SWR key based on create vs edit mode
   const TERMS_ENDPOINT = `/terms`;
   const key = initialData?.id
     ? `${TERMS_ENDPOINT}/${initialData.id}`
-    : TERMS_ENDPOINT;
+  : TERMS_ENDPOINT;
 
   const { trigger, isMutating } = useSWRMutation(key, mutationFetcher);
 
@@ -80,7 +72,7 @@ export function TermsForm({ initialData }: TermsFormProps) {
 
     try {
       const method = initialData?.id ? "PUT" : "POST";
-      const payload = { ...values, contentStatus: status, ...(initialData?.id && { id: initialData.id }) };
+      const payload = { ...values, contentStatus: status };
 
       await trigger({ method, body: payload });
 
@@ -105,51 +97,6 @@ export function TermsForm({ initialData }: TermsFormProps) {
       });
     } finally {
       setSubmitStatus(null);
-    }
-  };
-
-  // Handle submit draft - validate dengan draftTermSchema (less strict)
-  const handleSubmitDraft = async () => {
-    try {
-      const values = form.getValues();
-      // Validate dengan draft schema (less strict)
-      const validatedValues = draftTermSchema.parse(values);
-      await onSubmit(validatedValues as Term, "DRAFT");
-
-       router.push("/dashboard/terms");
-      router.refresh();
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const firstError = error.issues[0];
-        toast.error("Validasi gagal", {
-          description: `${firstError.path.join(".")}: ${firstError.message}`,
-        });
-      } else if (error instanceof Error) {
-        toast.error("Validasi gagal", {
-          description: error.message,
-        });
-      }
-    }
-  };
-
-  // Handle submit publish - validate dengan publishTermSchema (strict)
-  const handleSubmitPublish = async () => {
-    try {
-      const values = form.getValues();
-      // Validate dengan publish schema (strict)
-      const validatedValues = publishTermSchema.parse(values);
-      await onSubmit(validatedValues as Term, "PUBLISHED");
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const firstError = error.issues[0];
-        toast.error("Validasi gagal", {
-          description: `${firstError.path.join(".")}: ${firstError.message}`,
-        });
-      } else if (error instanceof Error) {
-        toast.error("Validasi gagal", {
-          description: error.message,
-        });
-      }
     }
   };
 
@@ -227,8 +174,12 @@ export function TermsForm({ initialData }: TermsFormProps) {
           loadingDraft={isMutating && submitStatus === "DRAFT"}
           loadingPublish={isMutating && submitStatus === "PUBLISHED"}
           onCancel={handleCancel}
-          onSubmitDraft={handleSubmitDraft}
-          onSubmitPublish={handleSubmitPublish}
+          onSubmitDraft={form.handleSubmit((values) =>
+            onSubmit(values, "DRAFT"),
+          )}
+          onSubmitPublish={form.handleSubmit((values) =>
+            onSubmit(values, "PUBLISHED"),
+          )}
         />
       </FormLayout.Actions>
     </FormLayout>

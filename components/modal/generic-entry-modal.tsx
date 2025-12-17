@@ -60,7 +60,7 @@ export function GenericEntryModal({
     if (!config?.endpoint) return "";
 
     // Prepend /api/v1 for relative endpoints
-    return `${BASE_API_URL}/${config.endpoint}`;
+    return `${config.endpoint}`;
   }, [config?.endpoint]);
 
   const { trigger, isMutating } = useSWRMutation(endpoint, mutationFetcher);
